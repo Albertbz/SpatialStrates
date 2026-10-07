@@ -32,7 +32,6 @@
         "Collaboration",
         "Streaming",
         "Movables",
-        "Datavisualization",
         "3D Models"
     ],
     "/Code/ImportMapping.wpm": [
@@ -294,59 +293,6 @@
         "Molecule Shape.jsx",
         "Molecule Uploader.jsx",
         "Molecule Styles.scss"
-    ],
-    "/Code/Datavisualization": [
-        "README.md",
-        "Modules",
-        "Components"
-    ],
-    "/Code/Datavisualization/Modules": [
-        "VisModule.wpm",
-        "Optomancy.wpm"
-    ],
-    "/Code/Datavisualization/Modules/VisModule.wpm": [
-        "descriptor.json",
-        "Vis-Helpers.jsx",
-        "Vis-Component Manager.jsx",
-        "Vis-Composer.jsx",
-        "Vis-Uploader.jsx"
-    ],
-    "/Code/Datavisualization/Modules/Optomancy.wpm": [
-        "descriptor.json"
-    ],
-    "/Code/Datavisualization/Components": [
-        "Visualization.wpm",
-        "VisPiece.wpm",
-        "VisShelf.wpm"
-    ],
-    "/Code/Datavisualization/Components/Visualization.wpm": [
-        "descriptor.json",
-        "Visualization.jsx",
-        "Vega-Lite 2D Visualization.jsx",
-        "Vega-Lite 2D Visualization Canvas.jsx",
-        "Vega-Lite 25D Visualization.jsx",
-        "Optomancy Visualization.jsx",
-        "Visualization Styles.scss"
-    ],
-    "/Code/Datavisualization/Components/VisPiece.wpm": [
-        "descriptor.json",
-        "Vis-Piece and Group Concepts.json",
-        "Vis-Piece Component.jsx",
-        "Vis-Group Component.jsx",
-        "Vis-Piece Shape.jsx",
-        "Vis-Group Shape.jsx",
-        "Vis-Editors Scene.jsx",
-        "Vis-Editors Canvas.jsx",
-        "Vis-Helpers.jsx",
-        "Vis-Piece Styles.scss"
-    ],
-    "/Code/Datavisualization/Components/VisShelf.wpm": [
-        "descriptor.json",
-        "Vis-Shelf Concepts.json",
-        "Vis-Shelf Component.jsx",
-        "Vis-Shelf Shape.jsx",
-        "Vis-Shelf Menu.jsx",
-        "Vis-Shelf Styles.scss"
     ],
     "/Code/3D Models": [
         "README.md",

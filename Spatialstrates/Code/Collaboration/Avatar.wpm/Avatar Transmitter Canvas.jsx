@@ -95,12 +95,13 @@ function AvatarTransmitter({ type }) {
         avatarConcept.setPropertyValue(conceptRef.current, 'userName', userName || '');
         avatarConcept.setPropertyValue(conceptRef.current, 'user', user || '');
         avatarConcept.setPropertyValue(conceptRef.current, 'deviceType', 'browser');
+        avatarConcept.setPropertyValue(conceptRef.current, 'deviceClass', 'laptop');
         avatarConcept.setPropertyValue(conceptRef.current, 'view', '2D');
 
         avatarConcept.setPropertyValue(conceptRef.current, 'otherSpace', '');
         avatarConcept.setPropertyValue(conceptRef.current, 'otherSpaceRelativePosition', [0, 0, 0]);
         avatarConcept.setPropertyValue(conceptRef.current, 'otherSpaceRelativeRotation', [0, 0, 0]);
-    }, [currentSpace, userName]);
+    }, [currentSpace, userName, user]);
 
     useEffect(() => {
         if (type !== 'cursor') return;

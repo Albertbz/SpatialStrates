@@ -100,6 +100,32 @@ const getActiveDeviceType = () => {
     return session.environmentBlendMode && session.environmentBlendMode !== 'opaque' ? 'ar' : 'vr';
 };
 
+const updateMergeRole = async (avatarConcept, avatarUUID, deviceType) => {
+    const pairedAvatar = await avatarConcept.getPropertyValue(avatarUUID, 'pairedAvatar');
+    const mergeState = await avatarConcept.getPropertyValue(avatarUUID, 'mergeState');
+    if (!pairedAvatar || !['merging', 'merged'].includes(mergeState)) return;
+
+    const pairedDeviceType = await avatarConcept.getPropertyValue(pairedAvatar, 'deviceType');
+    const pairedDeviceClass = await avatarConcept.getPropertyValue(pairedAvatar, 'deviceClass');
+    const ownDeviceClass = await avatarConcept.getPropertyValue(avatarUUID, 'deviceClass');
+    const devicePriority = { browser: 0, ar: 1, vr: 1 };
+    const ownPriority = devicePriority[deviceType] ?? 0;
+    const pairedPriority = devicePriority[pairedDeviceType] ?? 0;
+    const browserClassPriority = { laptop: 1, 'xr-browser': 0 };
+    const ownIsTarget = ownPriority > pairedPriority ||
+        (ownPriority === pairedPriority &&
+            deviceType === 'browser' &&
+            pairedDeviceType === 'browser' &&
+            browserClassPriority[ownDeviceClass] > browserClassPriority[pairedDeviceClass]) ||
+        (ownPriority === pairedPriority &&
+            (deviceType !== 'browser' || pairedDeviceType !== 'browser' ||
+                browserClassPriority[ownDeviceClass] === browserClassPriority[pairedDeviceClass]) &&
+            webstrate.clientId > await avatarConcept.getPropertyValue(pairedAvatar, 'client'));
+
+    await avatarConcept.setPropertyValue(avatarUUID, 'mergeRole', ownIsTarget ? 'target' : 'source');
+    await avatarConcept.setPropertyValue(pairedAvatar, 'mergeRole', ownIsTarget ? 'source' : 'target');
+};
+
 function AvatarTransmitter({ device, type, inputSourceProfiles }) {
     const conceptRef = useRef(null);
     const avatarConcept = VarvEngine.getConceptFromType('Avatar');
@@ -184,10 +210,15 @@ function AvatarTransmitter({ device, type, inputSourceProfiles }) {
             avatarConcept.setPropertyValue(conceptRef.current, 'userName', userName || '');
             avatarConcept.setPropertyValue(conceptRef.current, 'user', user || '');
             const activeDeviceType = getActiveDeviceType();
+            const deviceClass = xrPlatform && xrPlatform !== 'None' ? 'xr-browser' : 'laptop';
             if (activeDeviceType !== lastDeviceType.current) {
                 lastDeviceType.current = activeDeviceType;
                 avatarConcept.setPropertyValue(conceptRef.current, 'deviceType', activeDeviceType);
             }
+            avatarConcept.setPropertyValue(conceptRef.current, 'deviceClass', deviceClass);
+            updateMergeRole(avatarConcept, conceptRef.current, activeDeviceType).catch(error => {
+                console.error('Could not update merged avatar role:', error);
+            });
             avatarConcept.setPropertyValue(conceptRef.current, 'view', '3D');
             findOtherAvatarSpaces(conceptRef.current, currentSpace, newPosition, newRotation);
 

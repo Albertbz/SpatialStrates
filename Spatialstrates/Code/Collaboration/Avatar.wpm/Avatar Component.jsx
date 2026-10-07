@@ -162,6 +162,8 @@ function Avatar() {
     const [otherSpace] = useProperty('otherSpace');
     const [currentSpace] = useProperty('locationHash');
     const [active] = useProperty('active');
+    const [mergeState] = useProperty('mergeState');
+    const [mergeRole] = useProperty('mergeRole');
 
     const [location, setLocation] = useState('');
     const [targetContainer, setTargetContainer] = useState(null);
@@ -218,6 +220,8 @@ function Avatar() {
 
         runAsync();
     }, [space, otherSpace, currentSpace]);
+
+    if (mergeState === 'merged' && mergeRole === 'source') return null;
 
     return active && location ? <>
         {location == 'same' ? <AvatarInSameSpace /> : null}

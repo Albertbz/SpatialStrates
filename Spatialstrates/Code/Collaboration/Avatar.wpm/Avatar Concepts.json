@@ -17,10 +17,29 @@
                 "inputSourceProfile": "string",
                 "client": "string",
                 "user": "User",
+                "pairedAvatar": "Avatar",
+                "mergeRole": {
+                    "string": {
+                        "default": "none",
+                        "enum": [ "none", "source", "target" ]
+                    }
+                },
+                "mergeState": {
+                    "string": {
+                        "default": "unpaired",
+                        "enum": [ "unpaired", "paired", "merging", "merged" ]
+                    }
+                },
                 "deviceType": {
                     "string": {
                     "default": "browser",
                     "enum": [ "browser", "vr", "ar" ]
+                    }
+                },
+                "deviceClass": {
+                    "string": {
+                    "default": "laptop",
+                    "enum": [ "laptop", "xr-browser" ]
                     }
                 },
                 "clientAudioStream": { "array": {

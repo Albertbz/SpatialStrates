@@ -23,12 +23,14 @@ const cleanup = () => {
     }, 0);
 };
 
-function UserNameForwarder({ setUserName }) {
+function UserNameForwarder({ setUserName, setUser }) {
     const [name] = useProperty('name');
+    const [user] = useProperty('concept::uuid');
 
     useEffect(() => {
         setUserName(name);
-    }, [name]);
+        setUser(user);
+    }, [name, setUser, user]);
 }
 
 function AvatarTransmitter({ type }) {
@@ -37,6 +39,7 @@ function AvatarTransmitter({ type }) {
     const [currentSpace] = useProperty('locationHash');
     const [xrPlatform] = useProperty('xrPlatform');
     const [userName, setUserName] = useState('');
+    const [user, setUser] = useState('');
     const editor = useEditor();
     const [projectionPlane] = useProperty('projectionPlane');
 
@@ -90,6 +93,8 @@ function AvatarTransmitter({ type }) {
         if (!conceptRef.current) return;
         avatarConcept.setPropertyValue(conceptRef.current, 'space', currentSpace || '');
         avatarConcept.setPropertyValue(conceptRef.current, 'userName', userName || '');
+        avatarConcept.setPropertyValue(conceptRef.current, 'user', user || '');
+        avatarConcept.setPropertyValue(conceptRef.current, 'deviceType', 'browser');
         avatarConcept.setPropertyValue(conceptRef.current, 'view', '2D');
 
         avatarConcept.setPropertyValue(conceptRef.current, 'otherSpace', '');
@@ -145,9 +150,9 @@ function AvatarTransmitter({ type }) {
 
     const forwarderMemo = useMemo(() => <Varv concept="UserManager">
         <Varv property="localUser">
-            <UserNameForwarder setUserName={setUserName} />
+            <UserNameForwarder setUserName={setUserName} setUser={setUser} />
         </Varv>
-    </Varv>, [setUserName]);
+    </Varv>, [setUserName, setUser]);
 
     return forwarderMemo;
 }

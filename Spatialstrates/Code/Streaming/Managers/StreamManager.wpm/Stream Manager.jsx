@@ -12,6 +12,7 @@ export class StreamShare {
         let self = this;
         this.clientStreams = new Map();
         this.addedListeners = [];
+        this.removedListeners = [];
         if (!element) throw new Error('Must provide an actual DOM element for signalling, was ', element);
         if (element.parentElement === undefined) throw new Error('StreamShare element must be in DOM');
         this.supported = true;
@@ -31,6 +32,8 @@ export class StreamShare {
                 self._onStreamAdded(clientId, stream);
             });
         });
+
+        window.moduleStreamManager.streamShares.add(this);
     }
 
     stopSharing() {
@@ -42,6 +45,7 @@ export class StreamShare {
             this.currentStream.getTracks().forEach(track => track.stop());
             this.currentStream = null;
         }
+        this._onStreamRemoved(webstrate.clientId);
     }
 
     async shareStream(media, displayOptions = null) {
@@ -87,6 +91,14 @@ export class StreamShare {
             listener(client, stream);
         });
     }
+    _onStreamRemoved(client) {
+        if (!this.clientStreams.has(client)) return;
+
+        this.clientStreams.delete(client);
+        this.removedListeners.forEach(listener => {
+            listener(client);
+        });
+    }
     addStreamAddedListener(listener) {
         this.addedListeners.push(listener);
 
@@ -101,26 +113,46 @@ export class StreamShare {
             this.addedListeners.splice(index, 1);
         }
     }
+    addStreamRemovedListener(listener) {
+        this.removedListeners.push(listener);
+    }
+    removeStreamRemovedListener(listener) {
+        const index = this.removedListeners.indexOf(listener);
+        if (index > -1) {
+            this.removedListeners.splice(index, 1);
+        }
+    }
 }
 
 if (!window.moduleStreamManager) {
     window.moduleStreamManager = {
         clicked: false,
-        cleanupConceptTypes: []
+        cleanupConceptTypes: [],
+        streamShares: new Set()
     };
     document.addEventListener('click', () => { window.moduleStreamManager.clicked = true; });
 
     const cleanup = async () => {
-        // Remove screenshares when a client leaves or joins
-        for (const conceptType in window.moduleStreamManager.cleanupConceptTypes) {
+        // Remove stream metadata when a client leaves or joins
+        for (const conceptType of window.moduleStreamManager.cleanupConceptTypes) {
             if (webstrate.clients.length < 1) return;
             let concept = VarvEngine.getConceptFromType(conceptType);
             let shares = await (VarvEngine.lookupInstances(conceptType));
-            shares.filter(share => !webstrate.clients.includes(concept.getPropertyValue(share, 'client'))).forEach(share => { concept.delete(share); });
+            for (const share of shares) {
+                const client = await concept.getPropertyValue(share, 'client');
+                if (!webstrate.clients.includes(client)) {
+                    await concept.delete(share);
+                }
+            }
         }
     };
 
-    webstrate.on('clientPart', cleanup);
+    webstrate.on('clientPart', (clientId) => {
+        window.moduleStreamManager.streamShares.forEach(streamShare => {
+            streamShare._onStreamRemoved(clientId);
+        });
+        cleanup();
+    });
     webstrate.on('clientJoin', cleanup);
 }
 

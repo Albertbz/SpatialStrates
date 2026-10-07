@@ -77,21 +77,37 @@ const findOtherAvatarSpaces = async (avatarUUID, currentSpaceUUID, avatarPositio
     avatarConcept.setPropertyValue(avatarUUID, 'otherSpaceRelativeRotation', otherSpaceRelativeRotation);
 };
 
-function UserNameForwarder({ setUserName }) {
+function UserNameForwarder({ setUserName, setUser }) {
     const [name] = useProperty('name');
+    const [user] = useProperty('concept::uuid');
 
     useEffect(() => {
         setUserName(name);
-    }, [name]);
+        setUser(user);
+    }, [name, setUser, user]);
 }
 
 const SLOW_WRITEBACK_TIMEOUT = 500;
+const getActiveDeviceType = () => {
+    const session = window.xrStore?.getState?.()?.session;
+    if (!session) return 'browser';
+
+    const mode = session.mode || session.sessionMode;
+    if (mode === 'immersive-vr') return 'vr';
+    if (mode === 'immersive-ar') return 'ar';
+
+    // XRSession.mode is not exposed consistently by all WebXR implementations.
+    return session.environmentBlendMode && session.environmentBlendMode !== 'opaque' ? 'ar' : 'vr';
+};
+
 function AvatarTransmitter({ device, type, inputSourceProfiles }) {
     const conceptRef = useRef(null);
     const avatarConcept = VarvEngine.getConceptFromType('Avatar');
     const [currentSpace] = useProperty('locationHash');
     const [xrPlatform] = useProperty('xrPlatform');
     const [userName, setUserName] = useState('');
+    const [user, setUser] = useState('');
+    const lastDeviceType = useRef('browser');
 
     useEffect(() => {
         return () => {
@@ -166,6 +182,12 @@ function AvatarTransmitter({ device, type, inputSourceProfiles }) {
             avatarConcept.setPropertyValue(conceptRef.current, 'rotation', newRotation);
             avatarConcept.setPropertyValue(conceptRef.current, 'space', currentSpace || '');
             avatarConcept.setPropertyValue(conceptRef.current, 'userName', userName || '');
+            avatarConcept.setPropertyValue(conceptRef.current, 'user', user || '');
+            const activeDeviceType = getActiveDeviceType();
+            if (activeDeviceType !== lastDeviceType.current) {
+                lastDeviceType.current = activeDeviceType;
+                avatarConcept.setPropertyValue(conceptRef.current, 'deviceType', activeDeviceType);
+            }
             avatarConcept.setPropertyValue(conceptRef.current, 'view', '3D');
             findOtherAvatarSpaces(conceptRef.current, currentSpace, newPosition, newRotation);
 
@@ -177,9 +199,9 @@ function AvatarTransmitter({ device, type, inputSourceProfiles }) {
 
     const forwarderMemo = useMemo(() => <Varv concept="UserManager">
         <Varv property="localUser">
-            <UserNameForwarder setUserName={setUserName} />
+            <UserNameForwarder setUserName={setUserName} setUser={setUser} />
         </Varv>
-    </Varv>, [setUserName]);
+    </Varv>, [setUserName, setUser]);
 
     return forwarderMemo;
 }

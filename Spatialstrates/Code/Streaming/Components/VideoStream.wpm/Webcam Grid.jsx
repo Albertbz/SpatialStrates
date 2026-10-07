@@ -35,13 +35,26 @@ function WebcamTile() {
 
             if (!avatarUUID) return;
 
+            const updateUserName = async (changedUUID, avatarUserName) => {
+                if (changedUUID !== avatarUUID || cancelled) return;
+                setUserName(avatarUserName || client);
+            };
             const avatarUserName = await avatarConcept.getPropertyValue(avatarUUID, 'userName');
-            if (!cancelled && avatarUserName) {
-                setUserName(avatarUserName);
-            }
+            await updateUserName(avatarUUID, avatarUserName);
+            const changedCallback = (changedUUID, value) => {
+                updateUserName(changedUUID, value);
+            };
+            avatarConcept.getProperty('userName').addUpdatedCallback(changedCallback);
+
+            return () => {
+                avatarConcept.getProperty('userName').removeUpdatedCallback(changedCallback);
+            };
         };
 
-        loadUserName().catch((error) => {
+        let cleanup;
+        loadUserName().then((result) => {
+            cleanup = result;
+        }).catch((error) => {
             if (!cancelled) {
                 console.error(`Could not load avatar name for webcam client ${client}:`, error);
             }
@@ -49,6 +62,7 @@ function WebcamTile() {
 
         return () => {
             cancelled = true;
+            cleanup?.();
         };
     }, [client]);
 
@@ -66,10 +80,17 @@ function WebcamTile() {
             });
         };
 
+        const detachStream = (streamClient) => {
+            if (streamClient !== client || !videoRef.current) return;
+            videoRef.current.srcObject = null;
+        };
+
         streamShare.addStreamAddedListener(attachStream);
+        streamShare.addStreamRemovedListener(detachStream);
 
         return () => {
             streamShare.removeStreamAddedListener(attachStream);
+            streamShare.removeStreamRemovedListener(detachStream);
             if (videoRef.current) {
                 videoRef.current.srcObject = null;
             }

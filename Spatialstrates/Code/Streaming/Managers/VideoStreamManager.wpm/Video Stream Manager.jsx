@@ -39,6 +39,13 @@ if (!window.moduleVideoStreamManager) {
         element.srcObject = stream;
         doIfClicked(() => { element.play(); });
     });
+    window.moduleVideoStreamManager.streamShare.addStreamRemovedListener((client) => {
+        const element = document.querySelector(QUERY_PREFIX + client);
+        if (element) {
+            element.srcObject = null;
+            element.remove();
+        }
+    });
 
     // Convenience functions for managing Varv spawning and despawning
     window.stopSharingMyVideo = async () => {

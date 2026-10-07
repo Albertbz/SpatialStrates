@@ -16,6 +16,13 @@
                 "avatarXRPlatform": "string",
                 "inputSourceProfile": "string",
                 "client": "string",
+                "user": "User",
+                "deviceType": {
+                    "string": {
+                    "default": "browser",
+                    "enum": [ "browser", "vr", "ar" ]
+                    }
+                },
                 "clientAudioStream": { "array": {
                     "items": "AudioStream",
                     "derive": {

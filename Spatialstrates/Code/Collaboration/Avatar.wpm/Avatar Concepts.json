@@ -16,21 +16,6 @@
                 "avatarXRPlatform": "string",
                 "inputSourceProfile": "string",
                 "client": "string",
-                "clientVideoStream": { "array": {
-                    "items": "VideoStream",
-                    "derive": {
-                        "concepts": [ "VideoStream" ],
-                        "properties": [ "client" ],
-                        "transform": [
-                            { "get": { "property": "client", "as": "client" }},
-                            { "select": {
-                                "concept": "VideoStream",
-                                "where": { "property": "client", "equals": "$client" },
-                                "keepContext": true
-                            }}
-                        ]
-                    }
-                }},
                 "clientAudioStream": { "array": {
                     "items": "AudioStream",
                     "derive": {

@@ -7,11 +7,6 @@ import { Text } from '#Spatialstrates .text';
 
 
 
-let VideoStream;
-if (Fragment.one('#VideoStream .default')) {
-    const videoStreamModule = await Fragment.one('#VideoStream .default').require();
-    VideoStream = videoStreamModule.VideoStream;
-}
 let AudioStream;
 if (Fragment.one('#AudioStream .default')) {
     const audioStreamModule = await Fragment.one('#AudioStream .default').require();
@@ -120,9 +115,6 @@ function AvatarModel() {
                     {userName}
                 </Text>
             </Billboard> : null}
-            {type == 'camera' && VideoStream ? <Varv property="clientVideoStream">
-                <VideoStream client={client} />
-            </Varv> : null}
         </> : null}
         {AudioStream ? <Varv property="clientAudioStream">
             <AudioStream client={client} />

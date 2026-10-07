@@ -814,6 +814,12 @@
                             "auto": "",
                             "data-type": "text/javascript+babel"
                         }
+                    },
+                    "Webcam Grid.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-gui-component"
+                        }
                     }
                 },
                 "AudioStream.wpm": {

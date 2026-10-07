@@ -1,0 +1,9 @@
+{
+    "concepts": {
+        "AudioStream": {
+            "schema": {
+                "client": "string"
+            }
+        }
+    }
+}

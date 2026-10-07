@@ -1,0 +1,16 @@
+{
+    "concepts": {
+        "Molecule": {
+            "schema": {
+                "url": "string",
+                "moleculeScale": { "number": {
+                    "default": 0.001
+                }},
+                "note": "string"
+            },
+            "extensions": {
+                "inject": [ "Movable" ]
+            }
+        }
+    }
+}

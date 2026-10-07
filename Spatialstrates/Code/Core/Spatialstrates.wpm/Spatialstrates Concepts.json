@@ -1,0 +1,105 @@
+{
+    "concepts": {
+        "Environment": {
+            "schema": {
+                "name": "string",
+                "url": "string",
+                "position": { "array": {
+                    "items": "number",
+                    "default": [ 0, 0, 0 ]
+                }},
+                "rotation": { "array": {
+                    "items": "number",
+                    "default": [ 0, 0, 0 ]
+                }},
+                "scale": { "number": {
+                    "default": 1
+                }}
+            }
+        },
+        "SpaceManager": {
+            "schema": {
+                "placeholder": "string",
+                "locationHash": "Space",
+                "currentView": { "string": {
+                    "enum": [ "3D", "2D" ],
+                    "default": "3D"
+                }},
+                "showBoundary": "boolean",
+                "showProjectionPlane": "boolean",
+                "depthSensing": "boolean",
+                "xrPlatform": "string"
+            },
+            "mappings": {
+                "locationHash": [ "memory", "location", "cauldron"],
+                "currentView": [ "memory", "cauldron" ],
+                "showBoundary": [ "memory", "cauldron" ],
+                "showProjectionPlane": [ "memory", "cauldron" ],
+                "depthSensing": [ "memory", "cauldron" ],
+                "xrPlatform": [ "memory", "cauldron" ]
+            }
+        },
+        "Space": {
+            "schema": {
+                "name": "string",
+                "color": "string",
+                "movables": { "array": "Movable" },
+                "boundaryOrigin": { "array": {
+                    "items": "number",
+                    "default": [ 0, 1.5, 0 ]
+                }},
+                "boundarySize": { "array": {
+                    "items": "number",
+                    "default": [ 0.5, 0.5, 0.5 ]
+                }},
+                "projectionPlane": { "array": {
+                    "items": "number",
+                    "default": [ 0, 1.5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1 ]
+                }},
+                "environment": "Environment"
+            }
+        },
+        "Movable": {
+            "schema": {
+                "position": { "array": {
+                    "items": "number",
+                    "default": [ 0, 1.5, 0 ]
+                }},
+                "rotation": { "array": {
+                    "items": "number",
+                    "default": [ 0, 0, 0 ]
+                }},
+                "space": "Space",
+                "selected": "boolean",
+                "hovered": "boolean",
+                "beingDragged": "boolean"
+            },
+            "mappings": {
+                "selected": [ "memory", "cauldron" ],
+                "hovered": [ "memory", "cauldron" ],
+                "beingDragged": [ "memory", "cauldron" ]
+            }
+        },
+        "Container": {
+            "schema": {
+                "containedSpace": "Space",
+                "clippingMode": { "string": {
+                    "enum": [ "hide", "show", "fade" ],
+                    "default": "hide"
+                }},
+                "collaborationLevel": { "string": {
+                    "enum": [ "close", "loose", "none" ],
+                    "default": "close"
+                }}
+            },
+            "extensions": {
+                "inject": [ "Movable" ]
+            }
+        }
+    },
+    "dataStores": {
+         "location": {
+            "type":"location"
+        }
+    }
+}

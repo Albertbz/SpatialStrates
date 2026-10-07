@@ -1,0 +1,1396 @@
+{
+    "Codestrates": {
+        "#WPM-dev.wpm": {
+            "_attributes": {
+                "id": "WPM-dev"
+            }
+        },
+        "#WPM-loading-skin-simple.wpm": {
+            "_attributes": {
+                "id": "WPM-loading-skin-simple"
+            }
+        },
+        "FragmentFilesystemSync.wpm": {
+            "_attributes": {
+                "id": "FragmentFilesystemSync"
+            },
+            "descriptor.json": {
+                "_attributes": {
+                    "data-type": "wpm/descriptor"
+                }
+            },
+            "Fragment Filesystem Sync.js": {
+                "_attributes": {
+                    "data-type": "text/javascript"
+                }
+            },
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            }
+        }
+    },
+    "AGENTS.md": {
+        "_attributes": {
+            "data-type": "text/markdown"
+        }
+    },
+    "Meta Elements": {
+        "_attributes": {
+            "id": "meta-elements"
+        }
+    },
+    "Code": {
+        "_attributes": {
+            "id": "code"
+        },
+        "ImportMapping.wpm": {
+            "_attributes": {
+                "id": "ImportMapping"
+            },
+            "descriptor.json": {
+                "_attributes": {
+                    "data-type": "wpm/descriptor"
+                }
+            },
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "Import Mapping.json": {
+                "_attributes": {
+                    "data-type": "application/json",
+                    "class": "import-map"
+                }
+            },
+            "Update Import Mapping.js": {
+                "_attributes": {
+                    "auto": "",
+                    "data-type": "text/javascript"
+                }
+            }
+        },
+        "Core": {
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "InterFont.wpm": {
+                "_attributes": {
+                    "id": "InterFont"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Font Face.css": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/css"
+                    }
+                },
+                "Configuration.css": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/css"
+                    }
+                }
+            },
+            "MaterialSymbolsFont.wpm": {
+                "_attributes": {
+                    "id": "MaterialSymbolsFont"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Google Font.css": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/css"
+                    }
+                },
+                "Configuration.css": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/css"
+                    }
+                }
+            },
+            "Spatialstrates.wpm": {
+                "_attributes": {
+                    "id": "Spatialstrates"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "README.md": {
+                    "_attributes": {
+                        "data-type": "text/markdown"
+                    }
+                },
+                "Spatialstrates Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "React Reloader.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Init Manager Concept.js": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript"
+                    }
+                },
+                "Spatialstrates.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "spatialstrates"
+                    }
+                },
+                "Core Style.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                },
+                "Core Components": {
+                    "Global Events.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "global-events"
+                        }
+                    },
+                    "Dynamic Components.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-components"
+                        }
+                    },
+                    "Text Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "text"
+                        }
+                    },
+                    "Space Helpers.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "space-helpers"
+                        }
+                    }
+                },
+                "Scene View": {
+                    "_attributes": {
+                        "class": "scene-view"
+                    },
+                    "Components": {
+                        "Camera.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "camera"
+                            }
+                        },
+                        "Basic Environment.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "basic-environment"
+                            }
+                        },
+                        "Boundary Preview.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "boundary-preview"
+                            }
+                        },
+                        "Projection Plane Preview.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "projection-plane-preview"
+                            }
+                        },
+                        "Scene Movables.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "scene-movables"
+                            }
+                        }
+                    },
+                    "Scene View.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "scene-view"
+                        }
+                    },
+                    "Scene Helpers.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "scene-helpers"
+                        }
+                    },
+                    "Device Helpers.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "device-helpers"
+                        }
+                    }
+                },
+                "Canvas View": {
+                    "_attributes": {
+                        "class": "canvas-view"
+                    },
+                    "Components": {
+                        "Movable Canvas Controller.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "movable-canvas-controller"
+                            }
+                        },
+                        "Title Text.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "title-text"
+                            }
+                        },
+                        "Boundary Preview.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "boundary-preview"
+                            }
+                        },
+                        "Drag Detector.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "drag-detector"
+                            }
+                        },
+                        "Selected Hovered Detector.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "selected-hovered-detector"
+                            }
+                        },
+                        "Color Forwarder.jsx": {
+                            "_attributes": {
+                                "data-type": "text/javascript+babel",
+                                "class": "color-forwarder"
+                            }
+                        }
+                    },
+                    "Canvas View.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "canvas-view"
+                        }
+                    },
+                    "Projection Helpers.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "projection-helpers"
+                        }
+                    },
+                    "tldraw Styles.scss": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/x-scss"
+                        }
+                    }
+                },
+                "Movable": {
+                    "Movable Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "movable"
+                        }
+                    },
+                    "Movable Shape.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "movable-shape dynamic-shape-component"
+                        }
+                    },
+                    "Movable Helpers.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "movable-helpers"
+                        }
+                    }
+                },
+                "Container": {
+                    "Container Concepts.json": {
+                        "_attributes": {
+                            "data-type": "text/varv"
+                        }
+                    },
+                    "Container Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "container"
+                        }
+                    },
+                    "Container Shape.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-shape-component"
+                        }
+                    },
+                    "Container Helpers.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "container-helpers"
+                        }
+                    },
+                    "Container Style.scss": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/x-scss"
+                        }
+                    }
+                }
+            }
+        },
+        "Helpers": {
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "Icon.wpm": {
+                "_attributes": {
+                    "id": "Icon"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Icon Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default"
+                    }
+                }
+            },
+            "Dialog.wpm": {
+                "_attributes": {
+                    "id": "Dialog"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "README.md": {
+                    "_attributes": {
+                        "data-type": "text/markdown"
+                    }
+                },
+                "Dialog Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default"
+                    }
+                },
+                "Dialog Style.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            },
+            "AIHelpers.wpm": {
+                "_attributes": {
+                    "id": "AIHelpers"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "README.md": {
+                    "_attributes": {
+                        "data-type": "text/markdown"
+                    }
+                },
+                "AI Helpers OpenAI.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default"
+                    }
+                },
+                "AI Helpers LiteLLM.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel"
+                    }
+                }
+            }
+        },
+        "Basic": {
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "Menu.wpm": {
+                "_attributes": {
+                    "id": "Menu"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "README.md": {
+                    "_attributes": {
+                        "data-type": "text/markdown"
+                    }
+                },
+                "Menu.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-gui-component"
+                    }
+                },
+                "Menu Style.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            },
+            "ControllerMenu.wpm": {
+                "_attributes": {
+                    "id": "ControllerMenu"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "README.md": {
+                    "_attributes": {
+                        "data-type": "text/markdown"
+                    }
+                },
+                "Controller Menu.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-scene-component"
+                    }
+                }
+            },
+            "BasicMenus.wpm": {
+                "_attributes": {
+                    "id": "BasicMenus"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "XR Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Projection Plane Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Movable Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Container Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                }
+            },
+            "SpaceManager.wpm": {
+                "_attributes": {
+                    "id": "SpaceManager"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Space Manager.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-gui-component"
+                    }
+                },
+                "Space Manager Controller Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Space Manager Style.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            },
+            "SpatialstratesLogo.wpm": {
+                "_attributes": {
+                    "id": "SpatialstratesLogo"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Spatialstrates Logo Header.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-gui-component"
+                    }
+                },
+                "Update Head Content.js": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript"
+                    }
+                },
+                "Spatialstrates Logo Style.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            },
+            "CalibrationPoint.wpm": {
+                "_attributes": {
+                    "id": "CalibrationPoint"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Calibration Point.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-scene-component"
+                    }
+                }
+            }
+        },
+        "Collaboration": {
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "UserManager.wpm": {
+                "_attributes": {
+                    "id": "UserManager"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "User Manager Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "User Manager Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-gui-component"
+                    }
+                },
+                "Init Manager Concept.js": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript"
+                    }
+                },
+                "User Manager Style.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            },
+            "UserDisplay.wpm": {
+                "_attributes": {
+                    "id": "UserDisplay"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "User Display Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "User Display GUI.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-gui-component"
+                    }
+                },
+                "User Display Style.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            },
+            "Avatar.wpm": {
+                "_attributes": {
+                    "id": "Avatar"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Avatar Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "Avatar Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-scene-component"
+                    }
+                },
+                "Avatar Canvas Controller.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-canvas-component"
+                    }
+                },
+                "Avatar Shape.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-shape-component"
+                    }
+                },
+                "Avatar Transmitter Scene.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-scene-component"
+                    }
+                },
+                "Avatar Transmitter Canvas.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-canvas-component"
+                    }
+                },
+                "Avatar Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Init Manager Concept.js": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript"
+                    }
+                },
+                "Avatar Styles.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            }
+        },
+        "Streaming": {
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "Managers": {
+                "StreamManager.wpm": {
+                    "_attributes": {
+                        "id": "StreamManager"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Stream Manager.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default"
+                        }
+                    }
+                },
+                "ScreenStreamManager.wpm": {
+                    "_attributes": {
+                        "id": "ScreenStreamManager"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Screen Stream Manager.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default"
+                        }
+                    }
+                },
+                "VideoStreamManager.wpm": {
+                    "_attributes": {
+                        "id": "VideoStreamManager"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Video Stream Manager.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default"
+                        }
+                    }
+                },
+                "AudioStreamManager.wpm": {
+                    "_attributes": {
+                        "id": "AudioStreamManager"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Audio Stream Manager.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default"
+                        }
+                    }
+                }
+            },
+            "Components": {
+                "ScreenStream.wpm": {
+                    "_attributes": {
+                        "id": "ScreenStream"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Screen Stream Concepts.json": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/varv"
+                        }
+                    },
+                    "Screen Stream Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default dynamic-movable-scene-component"
+                        }
+                    },
+                    "Screen Stream Shape.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-shape-component"
+                        }
+                    },
+                    "Screen Stream Menu.jsx": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/javascript+babel"
+                        }
+                    }
+                },
+                "VideoStream.wpm": {
+                    "_attributes": {
+                        "id": "VideoStream"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Video Stream Concepts.json": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/varv"
+                        }
+                    },
+                    "Video Stream Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default"
+                        }
+                    },
+                    "Video Stream Menu.jsx": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/javascript+babel"
+                        }
+                    }
+                },
+                "AudioStream.wpm": {
+                    "_attributes": {
+                        "id": "AudioStream"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Audio Stream Concepts.json": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/varv"
+                        }
+                    },
+                    "Audio Stream Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default"
+                        }
+                    },
+                    "Audio Stream Menu.jsx": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/javascript+babel"
+                        }
+                    }
+                }
+            }
+        },
+        "Movables": {
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "StickyNote.wpm": {
+                "_attributes": {
+                    "id": "StickyNote"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Sticky Note Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "Sticky Note Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-movable-scene-component"
+                    }
+                },
+                "Sticky Note Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Sticky Note Shape.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-shape-component"
+                    }
+                },
+                "Sticky Note Style.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            },
+            "Image.wpm": {
+                "_attributes": {
+                    "id": "Image"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Image Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "Image Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-movable-scene-component"
+                    }
+                },
+                "Image Shape.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-shape-component"
+                    }
+                },
+                "Image Uploader and Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                }
+            },
+            "Trashcan.wpm": {
+                "_attributes": {
+                    "id": "Trashcan"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Trashcan Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "Trashcan Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-movable-scene-component"
+                    }
+                },
+                "Trashcan Shape.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-shape-component"
+                    }
+                },
+                "Trashcan Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                }
+            },
+            "Flashlight.wpm": {
+                "_attributes": {
+                    "id": "Flashlight"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Flashlight Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "Flashlight Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-movable-scene-component"
+                    }
+                },
+                "Flashlight Shape.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-shape-component"
+                    }
+                },
+                "Flashlight Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                }
+            },
+            "Molecule.wpm": {
+                "_attributes": {
+                    "id": "Molecule"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Molecule Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "Molecule Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-movable-scene-component"
+                    }
+                },
+                "Molecule Shape.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-shape-component"
+                    }
+                },
+                "Molecule Uploader.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Molecule Styles.scss": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/x-scss"
+                    }
+                }
+            }
+        },
+        "Datavisualization": {
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "Modules": {
+                "VisModule.wpm": {
+                    "_attributes": {
+                        "id": "VisModule"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Vis-Helpers.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vis-helpers"
+                        }
+                    },
+                    "Vis-Component Manager.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vis-component-manager"
+                        }
+                    },
+                    "Vis-Composer.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vis-composer"
+                        }
+                    },
+                    "Vis-Uploader.jsx": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/javascript+babel"
+                        }
+                    }
+                },
+                "Optomancy.wpm": {
+                    "_attributes": {
+                        "id": "Optomancy"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    }
+                }
+            },
+            "Components": {
+                "Visualization.wpm": {
+                    "_attributes": {
+                        "id": "Visualization"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Visualization.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default"
+                        }
+                    },
+                    "Vega-Lite 2D Visualization.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vega-lite-2d"
+                        }
+                    },
+                    "Vega-Lite 2D Visualization Canvas.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vega-lite-2d-canvas"
+                        }
+                    },
+                    "Vega-Lite 25D Visualization.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vega-lite-25d"
+                        }
+                    },
+                    "Optomancy Visualization.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "optomancy"
+                        }
+                    },
+                    "Visualization Styles.scss": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/x-scss"
+                        }
+                    }
+                },
+                "VisPiece.wpm": {
+                    "_attributes": {
+                        "id": "VisPiece"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Vis-Piece and Group Concepts.json": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/varv"
+                        }
+                    },
+                    "Vis-Piece Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vis-piece dynamic-movable-scene-component"
+                        }
+                    },
+                    "Vis-Group Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vis-group dynamic-movable-scene-component"
+                        }
+                    },
+                    "Vis-Piece Shape.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-shape-component"
+                        }
+                    },
+                    "Vis-Group Shape.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-shape-component"
+                        }
+                    },
+                    "Vis-Editors Scene.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vis-editors-scene"
+                        }
+                    },
+                    "Vis-Editors Canvas.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vis-editors-canvas"
+                        }
+                    },
+                    "Vis-Helpers.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "vis-helpers"
+                        }
+                    },
+                    "Vis-Piece Styles.scss": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/x-scss"
+                        }
+                    }
+                },
+                "VisShelf.wpm": {
+                    "_attributes": {
+                        "id": "VisShelf"
+                    },
+                    "descriptor.json": {
+                        "_attributes": {
+                            "data-type": "wpm/descriptor"
+                        }
+                    },
+                    "Vis-Shelf Concepts.json": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/varv"
+                        }
+                    },
+                    "Vis-Shelf Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "default dynamic-movable-scene-component"
+                        }
+                    },
+                    "Vis-Shelf Shape.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-shape-component"
+                        }
+                    },
+                    "Vis-Shelf Menu.jsx": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/javascript+babel"
+                        }
+                    },
+                    "Vis-Shelf Styles.scss": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/x-scss"
+                        }
+                    }
+                }
+            }
+        },
+        "3D Models": {
+            "README.md": {
+                "_attributes": {
+                    "data-type": "text/markdown"
+                }
+            },
+            "Model.wpm": {
+                "_attributes": {
+                    "id": "Model"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Model Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "Model Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-movable-scene-component"
+                    }
+                },
+                "Model Shape.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-shape-component"
+                    }
+                },
+                "Model Renderer.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "model-renderer"
+                    }
+                },
+                "Model Uploader.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                },
+                "Init Manager Concept.js": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript"
+                    }
+                }
+            },
+            "ModelShelf.wpm": {
+                "_attributes": {
+                    "id": "ModelShelf"
+                },
+                "descriptor.json": {
+                    "_attributes": {
+                        "data-type": "wpm/descriptor"
+                    }
+                },
+                "Model Shelf Concepts.json": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/varv"
+                    }
+                },
+                "Model Shelf Component.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "default dynamic-movable-scene-component"
+                    }
+                },
+                "Model Shelf Shape.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-shape-component"
+                    }
+                },
+                "Model Shelf Menu.jsx": {
+                    "_attributes": {
+                        "auto": "",
+                        "data-type": "text/javascript+babel"
+                    }
+                }
+            }
+        }
+    },
+    "Vis-Components": {
+        "_attributes": {
+            "id": "vis-component-container"
+        },
+        "Specs": {
+            "_attributes": {
+                "class": "spec-container"
+            }
+        },
+        "Datasets": {
+            "_attributes": {
+                "class": "dataset-container"
+            }
+        }
+    }
+}

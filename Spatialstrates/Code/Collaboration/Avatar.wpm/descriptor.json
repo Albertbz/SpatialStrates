@@ -1,0 +1,13 @@
+{
+    "description": "Awareness avatars for remote users.",
+    "dependencies": [
+        "varv-repos varv-signaling",
+        "#Spatialstrates",
+        "#Menu",
+        "#ControllerMenu"
+    ],
+    "assets": [
+        "avatar-models.zip"
+    ],
+    "version": "0.3.1"
+}

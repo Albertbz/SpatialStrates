@@ -1,0 +1,218 @@
+{
+    "creator": "WPMPackageManager",
+    "created": 1650368097912,
+    "require": [
+        {
+            "repositories": {
+                "codestrates-repos": "https://raw.githubusercontent.com/Webstrates/Codestrates-v2/master/codestrates.html",
+                "webstrate-components-repos": "https://raw.githubusercontent.com/Webstrates/WebstrateComponents/master/components.html",
+                "cauldron-repos": "https://raw.githubusercontent.com/Webstrates/Cauldron/master/cauldron.html",
+                "wpm_js_libs": "https://raw.githubusercontent.com/Webstrates/WebstrateLibraryRepository/master/libraries.html",
+                "varv-repos": "https://raw.githubusercontent.com/Webstrates/Varv/master/varv.html",
+                "wpm-repos": "https://raw.githubusercontent.com/Webstrates/WPM/master/build.html",
+                "spatialstrates-repos": "https://raw.githubusercontent.com/Webstrates/Spatialstrates/main/repository/spatialstrates.html"
+            },
+            "dependencies": [
+                {
+                    "package": "CauldronURLLauncher",
+                    "repository": "cauldron-repos"
+                },
+                {
+                    "package": "CauldronButtonLauncher",
+                    "repository": "cauldron-repos"
+                },
+                {
+                    "package": "fragment_js",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "fragment_html",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "fragment_json",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "fragment_wpm-descriptor",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "fragment_css",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "fragment_scss",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "fragment_js_babel",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "fragment_markdown",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "varv",
+                    "repository": "varv-repos"
+                },
+                {
+                    "package": "WPM-loading-skin-simple",
+                    "repository": "wpm-repos"
+                },
+                {
+                    "package": "ImportMapping",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Spatialstrates",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Icon",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Menu",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "ControllerMenu",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "AIHelpers",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "SpatialstratesLogo",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "CalibrationPoint",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "UserManager",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Avatar",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "StreamManager",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "ScreenStreamManager",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "VideoStreamManager",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "ScreenStream",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "AudioStreamManager",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "VideoStream",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "AudioStream",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "StickyNote",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Image",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Trashcan",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "InterFont",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Dialog",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "BasicMenus",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "SpaceManager",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "UserDisplay",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Model",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Flashlight",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Molecule",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "VisModule",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Optomancy",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "Visualization",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "VisPiece",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "VisShelf",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "ModelShelf",
+                    "repository": "spatialstrates-repos"
+                },
+                {
+                    "package": "FragmentFilesystemSync",
+                    "repository": "codestrates-repos"
+                },
+                {
+                    "package": "MaterialSymbolsFont",
+                    "repository": "spatialstrates-repos"
+                }
+            ],
+            "options": {}
+        }
+    ],
+    "updated": 1776332104977,
+    "knownRepositories": [
+        "varv-repos",
+        "wpm-repos",
+        "spatialstrates-repos"
+    ]
+}

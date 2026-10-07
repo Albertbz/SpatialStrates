@@ -219,17 +219,12 @@
     ],
     "/Code/Streaming/Managers": [
         "StreamManager.wpm",
-        "ScreenStreamManager.wpm",
         "VideoStreamManager.wpm",
         "AudioStreamManager.wpm"
     ],
     "/Code/Streaming/Managers/StreamManager.wpm": [
         "descriptor.json",
         "Stream Manager.jsx"
-    ],
-    "/Code/Streaming/Managers/ScreenStreamManager.wpm": [
-        "descriptor.json",
-        "Screen Stream Manager.jsx"
     ],
     "/Code/Streaming/Managers/VideoStreamManager.wpm": [
         "descriptor.json",
@@ -240,16 +235,8 @@
         "Audio Stream Manager.jsx"
     ],
     "/Code/Streaming/Components": [
-        "ScreenStream.wpm",
         "VideoStream.wpm",
         "AudioStream.wpm"
-    ],
-    "/Code/Streaming/Components/ScreenStream.wpm": [
-        "descriptor.json",
-        "Screen Stream Concepts.json",
-        "Screen Stream Component.jsx",
-        "Screen Stream Shape.jsx",
-        "Screen Stream Menu.jsx"
     ],
     "/Code/Streaming/Components/VideoStream.wpm": [
         "descriptor.json",

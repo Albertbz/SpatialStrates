@@ -106,15 +106,7 @@
                     "repository": "spatialstrates-repos"
                 },
                 {
-                    "package": "ScreenStreamManager",
-                    "repository": "spatialstrates-repos"
-                },
-                {
                     "package": "VideoStreamManager",
-                    "repository": "spatialstrates-repos"
-                },
-                {
-                    "package": "ScreenStream",
                     "repository": "spatialstrates-repos"
                 },
                 {

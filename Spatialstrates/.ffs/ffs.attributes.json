@@ -754,22 +754,6 @@
                         }
                     }
                 },
-                "ScreenStreamManager.wpm": {
-                    "_attributes": {
-                        "id": "ScreenStreamManager"
-                    },
-                    "descriptor.json": {
-                        "_attributes": {
-                            "data-type": "wpm/descriptor"
-                        }
-                    },
-                    "Screen Stream Manager.jsx": {
-                        "_attributes": {
-                            "data-type": "text/javascript+babel",
-                            "class": "default"
-                        }
-                    }
-                },
                 "VideoStreamManager.wpm": {
                     "_attributes": {
                         "id": "VideoStreamManager"
@@ -804,40 +788,6 @@
                 }
             },
             "Components": {
-                "ScreenStream.wpm": {
-                    "_attributes": {
-                        "id": "ScreenStream"
-                    },
-                    "descriptor.json": {
-                        "_attributes": {
-                            "data-type": "wpm/descriptor"
-                        }
-                    },
-                    "Screen Stream Concepts.json": {
-                        "_attributes": {
-                            "auto": "",
-                            "data-type": "text/varv"
-                        }
-                    },
-                    "Screen Stream Component.jsx": {
-                        "_attributes": {
-                            "data-type": "text/javascript+babel",
-                            "class": "default dynamic-movable-scene-component"
-                        }
-                    },
-                    "Screen Stream Shape.jsx": {
-                        "_attributes": {
-                            "data-type": "text/javascript+babel",
-                            "class": "dynamic-shape-component"
-                        }
-                    },
-                    "Screen Stream Menu.jsx": {
-                        "_attributes": {
-                            "auto": "",
-                            "data-type": "text/javascript+babel"
-                        }
-                    }
-                },
                 "VideoStream.wpm": {
                     "_attributes": {
                         "id": "VideoStream"

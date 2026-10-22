@@ -5,6 +5,7 @@ import { Varv, useProperty } from '#VarvReact';
 
 import { useTransform } from '#Spatialstrates .movable';
 import { projectToCanvas, CANVAS_SCALE } from '#Spatialstrates .projection-helpers';
+import { useMergePartnerClient } from '#Avatar .merge-helpers';
 
 
 
@@ -130,19 +131,29 @@ function AvatarCanvasController({ parent }) {
     }, [editor, shapeID]);
 }
 
-function AvatarChecker() {
+function AvatarChecker({ hiddenClient }) {
     const [currentSpace] = useProperty('locationHash');
     const [space] = useProperty('space');
+    const [client] = useProperty('client');
+
+    // The device this device is merged with is part of the same user, so it is not shown
+    if (hiddenClient && client === hiddenClient) return null;
 
     return currentSpace && currentSpace == space ? <AvatarCanvasController /> : null;
+}
+
+function AvatarCheckers() {
+    const partnerClient = useMergePartnerClient();
+
+    return <Varv concept="Avatar" if="!isMine">
+        <AvatarChecker hiddenClient={partnerClient} />
+    </Varv>;
 }
 
 export function Main() {
     return <Varv concept="AvatarManager" if="enabled">
         <Varv property="locationHash">
-            <Varv concept="Avatar" if="!isMine">
-                <AvatarChecker />
-            </Varv>
+            <AvatarCheckers />
             {/* <Varv concept="Avatar" if="isMine">
                 <AvatarRemoteController />
             </Varv> */}

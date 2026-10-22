@@ -189,19 +189,14 @@ function AvatarTransmitter({ device, type, inputSourceProfiles }) {
         };
 
         if (!slowWritebackTimeout.current) {
-            let newPosition, newRotation;
-            if (type === 'camera') {
-                newPosition = device.position.toArray();
-                newRotation = [device.rotation.x, device.rotation.y, device.rotation.z];
-            } else {
-                const tempPosition = new Vector3();
-                device?.getWorldPosition(tempPosition);
-                newPosition = tempPosition.toArray();
-                const tempQuaternion = new Quaternion();
-                device?.getWorldQuaternion(tempQuaternion);
-                const tempEuler = new Euler().setFromQuaternion(tempQuaternion);
-                newRotation = [tempEuler.x, tempEuler.y, tempEuler.z];
-            }
+            // World transforms are used, as the XR camera is placed inside the movable XR origin
+            const tempPosition = new Vector3();
+            device?.getWorldPosition(tempPosition);
+            const newPosition = tempPosition.toArray();
+            const tempQuaternion = new Quaternion();
+            device?.getWorldQuaternion(tempQuaternion);
+            const tempEuler = new Euler().setFromQuaternion(tempQuaternion);
+            const newRotation = [tempEuler.x, tempEuler.y, tempEuler.z];
 
             avatarConcept.setPropertyValue(conceptRef.current, 'active', true);
             avatarConcept.setPropertyValue(conceptRef.current, 'position', newPosition);

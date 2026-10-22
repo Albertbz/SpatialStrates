@@ -211,7 +211,10 @@
         "Avatar Transmitter Canvas.jsx",
         "Avatar Menu.jsx",
         "Init Manager Concept.js",
-        "Avatar Styles.scss"
+        "Avatar Styles.scss",
+        "Merge Helpers.jsx",
+        "Merge Space Sync.jsx",
+        "Merge View Sync.jsx"
     ],
     "/Code/Streaming": [
         "README.md",

@@ -1,7 +1,7 @@
 import React from 'react';
-const { useEffect, useMemo } = React;
+const { useEffect, useMemo, useRef } = React;
 import { Canvas, useThree } from '@react-three/fiber';
-import { XR, createXRStore, IfInSessionMode, useXRInputSourceState, noEvents, PointerEvents } from '@react-three/xr';
+import { XR, XROrigin, createXRStore, IfInSessionMode, useXR, useXRInputSourceState, noEvents, PointerEvents } from '@react-three/xr';
 import { Stats, Environment } from '@react-three/drei';
 import { Varv, useProperty } from '#VarvReact';
 
@@ -53,7 +53,21 @@ function Scene({ movableSceneComponents }) {
         window.moduleDeviceManager.handLeft = handLeft;
     }, [handLeft]);
 
+    // The XR origin can be moved, e.g., to start a VR session where a merged device was looking from
+    const originRef = useRef(null);
+    const session = useXR((xr) => xr.session);
+    useEffect(() => {
+        window.moduleDeviceManager.origin = originRef.current;
+    }, []);
+    useEffect(() => {
+        if (session || !originRef.current) return;
+        originRef.current.position.set(0, 0, 0);
+        originRef.current.rotation.set(0, 0, 0);
+    }, [session]);
+
     return <>
+        <XROrigin ref={originRef} />
+
         {/* Basic Lighting */}
         <Environment preset="city" />
 

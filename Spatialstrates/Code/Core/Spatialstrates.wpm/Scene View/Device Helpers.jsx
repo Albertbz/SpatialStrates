@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { Vector3, Quaternion, Euler } from 'three';
 
 
 
@@ -8,16 +8,14 @@ export const devicePositionWithOffset = (device, offset = 0) => {
     let z = 0;
 
     if (device) {
-        let position = device.position;
+        // World transforms are used, as devices can be nested, e.g., the XR camera inside the XR origin
+        const position = device.getWorldPosition(new Vector3());
 
         // If the distance option is given we move the position in the direction the device is looking
         if (offset != 0) {
             const direction = new Vector3(0, 0, -1);
-            direction.normalize();
-            direction.applyQuaternion(device.quaternion);
-
-            position = new Vector3();
-            position.copy(device.position).add(direction.multiplyScalar(offset));
+            direction.applyQuaternion(device.getWorldQuaternion(new Quaternion()));
+            position.add(direction.multiplyScalar(offset));
         }
 
         x = position.x;
@@ -34,9 +32,10 @@ export const deviceRotation = (device) => {
     let z = 0;
 
     if (device) {
-        x = device.rotation._x;
-        y = device.rotation._y;
-        z = device.rotation._z;
+        const rotation = new Euler().setFromQuaternion(device.getWorldQuaternion(new Quaternion()), device.rotation.order);
+        x = rotation.x;
+        y = rotation.y;
+        z = rotation.z;
     }
 
     return [x, y, z];

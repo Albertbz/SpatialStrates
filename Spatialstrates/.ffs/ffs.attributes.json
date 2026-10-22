@@ -740,6 +740,24 @@
                         "auto": "",
                         "data-type": "text/x-scss"
                     }
+                },
+                "Merge Helpers.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "merge-helpers"
+                    }
+                },
+                "Merge Space Sync.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-gui-component dynamic-xr-gui-component"
+                    }
+                },
+                "Merge View Sync.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-scene-component"
+                    }
                 }
             }
         },

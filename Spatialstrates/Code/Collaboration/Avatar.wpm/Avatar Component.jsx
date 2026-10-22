@@ -4,6 +4,7 @@ import { Cone, Gltf, useGLTF, Box, Billboard } from '@react-three/drei';
 import { Varv, useProperty } from '#VarvReact';
 
 import { Text } from '#Spatialstrates .text';
+import { useMergePartnerClient } from '#Avatar .merge-helpers';
 
 
 
@@ -157,7 +158,8 @@ function AvatarInOtherContainer() {
     </group>;
 }
 
-function Avatar() {
+function Avatar({ hiddenClient }) {
+    const [client] = useProperty('client');
     const [space] = useProperty('space');
     const [otherSpace] = useProperty('otherSpace');
     const [currentSpace] = useProperty('locationHash');
@@ -222,6 +224,8 @@ function Avatar() {
     }, [space, otherSpace, currentSpace]);
 
     if (mergeState === 'merged' && mergeRole === 'source') return null;
+    // The device this device is merged with is part of the same user, so it would only obstruct the view
+    if (hiddenClient && client === hiddenClient) return null;
 
     return active && location ? <>
         {location == 'same' ? <AvatarInSameSpace /> : null}
@@ -251,9 +255,11 @@ function Avatar() {
 // }
 
 function Avatars() {
+    const partnerClient = useMergePartnerClient();
+
     return <>
         <Varv concept="Avatar" if="!isMine">
-            <Avatar />
+            <Avatar hiddenClient={partnerClient} />
         </Varv>
         {/* <Varv concept="Avatar" if="isMine">
             <AvatarRemoteController />

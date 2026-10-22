@@ -6,7 +6,7 @@ import { useXR, useXRInputSourceState, useGetXRSpaceMatrix } from '@react-three/
 import { Container, Text as UIText } from '@react-three/uikit';
 import { Label } from '@react-three/uikit-default';
 import { Panel, Button } from '@react-three/uikit-horizon';
-import { Varv, useProperty } from '#VarvReact';
+import { MenuIcon, XIcon } from '@react-three/uikit-lucide';
 
 
 
@@ -110,26 +110,9 @@ function SubMenuComponent({ key, children }) {
     </Container>
 }
 
-function PropertyForwarder({ setColor, setName }) {
-    const [color] = useProperty('color');
-    const [name] = useProperty('name');
-
-    useEffect(() => {
-        if (typeof color !== 'string') return;
-        setColor(color);
-    }, [color]);
-
-    useEffect(() => {
-        if (typeof name !== 'string') return;
-        setName(name);
-    }, [name]);
-}
-
 function SubMenus() {
     const [showMenu, setShowMenu] = useState(false);
     const [output, setOutput] = useState(null);
-    const [color, setColor] = useState('');
-    const [name, setName] = useState('');
 
     const updateMenu = () => {
         const subMenus = Array.from(window.moduleControllerMenu.subMenus.values());
@@ -157,27 +140,24 @@ function SubMenus() {
         updateMenu();
     }, []);
 
-    return <>
-        <Varv concept="SpaceManager">
-            <Varv property="locationHash">
-                <PropertyForwarder setColor={setColor} setName={setName} />
-            </Varv>
-        </Varv>
-        <Panel
-            anchorX="center"
-            anchorY="bottom"
-            pixelSize={0.0005}
-            padding={16}
-            gap={16}
-            flexDirection="column">
-            {showMenu ? output : null}
-            <Button
-                variant="primary"
-                onClick={() => setShowMenu(!showMenu)}>
-                <UIText>{name || 'Toggle Menu'}</UIText>
-            </Button>
-        </Panel>
-    </>;
+    return <Panel
+        anchorX="center"
+        anchorY="bottom"
+        pixelSize={0.0005}
+        padding={16}
+        gap={16}
+        flexDirection="column">
+        {showMenu ? output : null}
+        <Button
+            variant="primary"
+            flexDirection="row"
+            alignItems="center"
+            gap={8}
+            onClick={() => setShowMenu(!showMenu)}>
+            {showMenu ? <XIcon width={20} height={20} /> : <MenuIcon width={20} height={20} />}
+            <UIText>{showMenu ? 'Close Menu' : 'Open Menu'}</UIText>
+        </Button>
+    </Panel>;
 }
 
 // Keep the menu at its last pose for a moment when tracking drops, so short dropouts do not make it flicker

@@ -1,8 +1,9 @@
 import React from 'react';
-import { IfSessionModeSupported } from '@react-three/xr';
+import { IfSessionModeSupported, useXR } from '@react-three/xr';
 import { Varv, useProperty } from '#VarvReact';
 
 import { addSubMenu, addItemToSubMenu, MenuTitle, MenuSpacer, MenuButton } from '#Menu .default';
+import { addControllerSubMenu, addItemToControllerSubMenu, ControllerMenuTitle, ControllerMenuButton } from '#ControllerMenu .default';
 
 
 
@@ -137,3 +138,22 @@ addItemToSubMenu('camera', 'title', <Varv concept="SpaceManager">
 addSubMenu('media-sharing', 500, false);
 addItemToSubMenu('media-sharing', 'title', <MenuTitle title="Media Sharing" />, 0);
 addItemToSubMenu('media-sharing', 'share-link', <MenuButton onClick={shareLink}>Send to Quest</MenuButton>, 1000);
+
+
+// Ends the immersive session and returns to the regular browser view
+function ExitXRControllerButton() {
+    const session = useXR((xr) => xr.session);
+    const mode = useXR((xr) => xr.mode);
+
+    const exitXR = async () => {
+        if (!session) return;
+        await session.end();
+        window.xrStore?.setState({ session: null });
+    };
+
+    return <ControllerMenuButton onClick={exitXR}>{mode === 'immersive-ar' ? 'Exit AR' : 'Exit VR'}</ControllerMenuButton>;
+}
+
+addControllerSubMenu('xr-session', 50, false);
+addItemToControllerSubMenu('xr-session', 'title', <ControllerMenuTitle title="Session" />, 0);
+addItemToControllerSubMenu('xr-session', 'exit-xr', <ExitXRControllerButton />, 100);

@@ -86,10 +86,20 @@ function SpaceView() {
     return currentSpace ? view : null;
 }
 
+// XR-capable devices only get the reduced XR GUI, all other devices get the full GUI
+function GUIComponents() {
+    const [xrPlatform] = useProperty('xrPlatform');
+
+    if (!xrPlatform) return null;
+    return xrPlatform === 'None'
+        ? <DynamicComponents key="gui" selector=".dynamic-gui-component" />
+        : <DynamicComponents key="xr-gui" selector=".dynamic-xr-gui-component" />;
+}
+
 export function App() {
     return <GlobalEventProvider>
         <Varv concept="SpaceManager">
-            <DynamicComponents selector=".dynamic-gui-component" />
+            <GUIComponents />
             <SpaceView />
         </Varv>
     </GlobalEventProvider>;

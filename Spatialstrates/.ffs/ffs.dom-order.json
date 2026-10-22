@@ -197,7 +197,9 @@
         "descriptor.json",
         "User Display Concepts.json",
         "User Display GUI.jsx",
-        "User Display Style.scss"
+        "User Display Style.scss",
+        "Pairing Helpers.jsx",
+        "XR Pairing GUI.jsx"
     ],
     "/Code/Collaboration/Avatar.wpm": [
         "descriptor.json",

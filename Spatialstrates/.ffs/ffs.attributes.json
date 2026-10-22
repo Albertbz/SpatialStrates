@@ -664,6 +664,18 @@
                         "auto": "",
                         "data-type": "text/x-scss"
                     }
+                },
+                "Pairing Helpers.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "pairing-helpers"
+                    }
+                },
+                "XR Pairing GUI.jsx": {
+                    "_attributes": {
+                        "data-type": "text/javascript+babel",
+                        "class": "dynamic-xr-gui-component"
+                    }
                 }
             },
             "Avatar.wpm": {

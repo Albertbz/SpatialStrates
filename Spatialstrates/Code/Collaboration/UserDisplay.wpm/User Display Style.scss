@@ -44,3 +44,132 @@
         }
     }
 }
+
+.xr-pairing {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: hsl(204, 16%, 94%);
+    user-select: none;
+
+    .xr-pairing-panel {
+        width: 100%;
+        max-width: 560px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        p {
+            margin: 0;
+            font-size: 18px;
+            color: #444;
+        }
+    }
+
+    .xr-pairing-headline {
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    button {
+        font-size: 20px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid #cccccc70;
+        border-radius: 16px;
+        background: #fff;
+
+        &:disabled {
+            cursor: default;
+            opacity: 0.5;
+        }
+    }
+
+    .xr-pairing-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        &:empty::before {
+            content: 'No other users are in this space yet.';
+            font-size: 18px;
+            color: #777;
+        }
+    }
+
+    .xr-pairing-user {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        min-height: 72px;
+        padding: 0 20px;
+        text-align: left;
+
+        .material-icons {
+            font-size: 32px;
+        }
+
+        .xr-pairing-user-name {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        small {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .xr-pairing-user-status {
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            background: #eee;
+        }
+
+        &.paired {
+            background: hsl(34, 100%, 73%);
+            opacity: 1;
+        }
+    }
+
+    .xr-pairing-notice {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 16px;
+        background: #fff3e0;
+
+        button {
+            align-self: flex-start;
+            padding: 8px 16px;
+        }
+    }
+
+    .xr-pairing-actions {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+
+        button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 64px;
+            color: #fff;
+            background: #636363;
+        }
+    }
+}

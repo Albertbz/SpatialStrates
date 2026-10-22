@@ -1,8 +1,8 @@
 import React from 'react';
 const { useState, useEffect, useMemo, useRef } = React;
-import { Color } from 'three';
+import { Color, Matrix4 } from 'three';
 import { createPortal, useFrame } from '@react-three/fiber';
-import { useXRInputSourceState } from '@react-three/xr';
+import { useXR, useXRInputSourceState, useGetXRSpaceMatrix } from '@react-three/xr';
 import { Container, Text as UIText } from '@react-three/uikit';
 import { Label } from '@react-three/uikit-default';
 import { Panel, Button } from '@react-three/uikit-horizon';
@@ -180,35 +180,79 @@ function SubMenus() {
     </>;
 }
 
+// Keep the menu at its last pose for a moment when tracking drops, so short dropouts do not make it flicker
+const TRACKING_LOST_GRACE_PERIOD = 500;
+
+const tempTargetRayMatrix = new Matrix4();
+const tempWristMatrix = new Matrix4();
+
 function ControllerMenu() {
     const controllerLeft = useXRInputSourceState('controller', 'left');
     const handLeft = useXRInputSourceState('hand', 'left');
-    const [output, setOutput] = useState(null);
+    const origin = useXR((xr) => xr.origin);
+    const session = useXR((xr) => xr.session);
+    const anchorRef = useRef(null);
+    const lastTrackedTime = useRef(-Infinity);
+    const wristToTargetRay = useRef(null);
 
-    const submenus = useMemo(() => <SubMenus />, []);
-    const menu = useMemo(() => <group
-        position={controllerLeft ? [0, 0.11, 0.06] : [-0.02, 0.06, 0.11]}
-        rotation={controllerLeft ? [-Math.PI / 2, 0, 0] : [-0.2, 0.2, -0.5]}>
-        {submenus}
-    </group>, [submenus, controllerLeft]);
+    // Controllers follow the grip space, as the controller model does. The models themselves are replaced or
+    // unmounted when tracking is lost, so the menu must not be attached to them.
+    const getControllerMatrix = useGetXRSpaceMatrix(controllerLeft
+        ? controllerLeft.inputSource.gripSpace ?? controllerLeft.inputSource.targetRaySpace
+        : undefined);
 
+    // A hand's target ray is an aiming ray that is not rigidly attached to the hand, and it is re-estimated when
+    // tracking is regained. The hand menu therefore follows the wrist joint, using the offset between the wrist
+    // and the target ray captured once per session, so it keeps its initial placement relative to the hand.
+    const getHandTargetRayMatrix = useGetXRSpaceMatrix(controllerLeft ? undefined : handLeft?.inputSource.targetRaySpace);
+    const getWristMatrix = useGetXRSpaceMatrix(controllerLeft ? undefined : handLeft?.inputSource.hand?.get('wrist'));
 
-    const slowWritebackTimeout = useRef(null);
-    useFrame(() => {
-        if (!slowWritebackTimeout.current) {
-            const parent = controllerLeft ? controllerLeft?.object : handLeft ? handLeft?.object : null;
-            if (parent) {
-                setOutput(createPortal(menu, parent));
-            } else {
-                setOutput(null);
-            }
-            slowWritebackTimeout.current = setTimeout(() => {
-                slowWritebackTimeout.current = null;
-            }, 1000);
+    useEffect(() => {
+        wristToTargetRay.current = null;
+    }, [session]);
+
+    const updateHandMatrix = (target, frame) => {
+        if (!getWristMatrix?.(tempWristMatrix, frame)) return false;
+
+        if (!wristToTargetRay.current) {
+            if (!getHandTargetRayMatrix?.(tempTargetRayMatrix, frame)) return false;
+            wristToTargetRay.current = tempWristMatrix.clone().invert().multiply(tempTargetRayMatrix);
         }
-    });
 
-    return output;
+        target.multiplyMatrices(tempWristMatrix, wristToTargetRay.current);
+        return true;
+    };
+
+    useFrame((_state, _delta, frame) => {
+        const anchor = anchorRef.current;
+        if (!anchor) return;
+
+        const tracked = controllerLeft
+            ? getControllerMatrix?.(anchor.matrix, frame)
+            : updateHandMatrix(anchor.matrix, frame);
+
+        if (tracked) {
+            lastTrackedTime.current = performance.now();
+            anchor.visible = true;
+        } else {
+            anchor.visible = performance.now() - lastTrackedTime.current < TRACKING_LOST_GRACE_PERIOD;
+        }
+        // Invisible objects still receive pointer events, so stop pointers from hitting the hidden menu
+        anchor.intersectChildren = anchor.visible;
+    }, -100);
+
+    // The menu stays mounted while tracking is lost, so it keeps its state and reappears as soon as tracking returns
+    const submenus = useMemo(() => <SubMenus />, []);
+
+    if (!origin || !session) return null;
+
+    return createPortal(<group ref={anchorRef} matrixAutoUpdate={false} visible={false}>
+        <group
+            position={controllerLeft ? [0, 0.11, 0.06] : [-0.02, 0.06, 0.11]}
+            rotation={controllerLeft ? [-Math.PI / 2, 0, 0] : [-0.2, 0.2, -0.5]}>
+            {submenus}
+        </group>
+    </group>, origin);
 }
 
 

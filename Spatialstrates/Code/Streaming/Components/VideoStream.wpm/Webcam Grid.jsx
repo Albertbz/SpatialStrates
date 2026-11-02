@@ -71,7 +71,8 @@ function WebcamTile({ client, userName }) {
     </div>;
 }
 
-function WebcamGrid() {
+// Picks one stream per user, preferring XR devices, so 2D and XR show the same webcam tiles
+export function useWebcamTiles() {
     const [tiles, setTiles] = useState([]);
 
     useEffect(() => {
@@ -164,6 +165,12 @@ function WebcamGrid() {
             streamShare.removeStreamRemovedListener(refreshTiles);
         };
     }, []);
+
+    return tiles;
+}
+
+function WebcamGrid() {
+    const tiles = useWebcamTiles();
 
     return <div className="webcam-grid" style={{
         position: 'fixed',

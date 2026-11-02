@@ -36,14 +36,18 @@ export const followPose = (cameraObject, position, rotation, delta) => {
     cameraObject.updateMatrixWorld(true);
 };
 
-// Shared between the follow status GUI, which looks up the presenter, and the scene, which moves the camera
-export const useFollowStore = create(() => ({
-    status: 'none',
-    presenterName: '',
-    presenterClient: null,
-    position: null,
-    rotation: null
-}));
+// Shared between the follow status GUI, which looks up the presenter, and the scene, which moves the camera.
+// Each fragment that imports this module gets its own instance, so the store has to live on the window.
+if (!window.moduleFollowStore) {
+    window.moduleFollowStore = create(() => ({
+        status: 'none',
+        presenterName: '',
+        presenterClient: null,
+        position: null,
+        rotation: null
+    }));
+}
+export const useFollowStore = window.moduleFollowStore;
 
 // Returns the presenting user and their camera avatar while it is in VR or AR, or null when nobody is presenting
 export const getPresenterInfo = async () => {

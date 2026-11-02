@@ -1,5 +1,5 @@
 import React from 'react';
-const { useEffect, useMemo, useRef } = React;
+const { useEffect, useMemo, useRef, Suspense } = React;
 import { Canvas, useThree } from '@react-three/fiber';
 import { XR, XROrigin, createXRStore, IfInSessionMode, useXR, useXRInputSourceState, noEvents, PointerEvents } from '@react-three/xr';
 import { Stats, Environment } from '@react-three/drei';
@@ -149,9 +149,12 @@ export function SceneView({ movableSceneComponents }) {
             events={noEvents} // We use the PointerEvents component from @react-three/xr instead
         >
             <PointerEvents />
-            <XR store={store}>
-                <Scene movableSceneComponents={movableSceneComponents} />
-            </XR>
+            {/* Keeps suspending assets inside the scene from suspending the whole app, which blocks all GUI updates */}
+            <Suspense fallback={null}>
+                <XR store={store}>
+                    <Scene movableSceneComponents={movableSceneComponents} />
+                </XR>
+            </Suspense>
         </Canvas>
     </>;
 }

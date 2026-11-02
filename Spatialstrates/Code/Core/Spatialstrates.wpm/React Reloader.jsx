@@ -10,6 +10,10 @@ const WATCHED_FRAGMENTS = [
 
 
 
+// Varv bindings in useProperty are only created on mount and die when the engine reloads,
+// so the app is remounted with a new key after every engine reload
+let engineGeneration = 0;
+
 async function render() {
     if (!window.cachedAppRoot) {
         const element = document.createElement('transient');
@@ -19,7 +23,7 @@ async function render() {
     }
 
     const content = await Fragment.one("#Spatialstrates .spatialstrates").require();
-    window.cachedAppRoot.render(React.createElement(content.App));
+    window.cachedAppRoot.render(React.createElement(content.App, { key: engineGeneration }));
 };
 
 let reloadTimer;
@@ -39,6 +43,7 @@ WATCHED_FRAGMENTS.forEach(frag => {
 
 if (VarvEngine) {
     VarvEngine.registerEventCallback('engineReloaded', () => {
+        engineGeneration++;
         reload();
     });
 }

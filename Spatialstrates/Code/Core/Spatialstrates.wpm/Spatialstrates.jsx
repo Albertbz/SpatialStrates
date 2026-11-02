@@ -1,5 +1,5 @@
 import React from 'react';
-const { useMemo, useEffect, useRef } = React;
+const { useMemo, useEffect, useRef, useState } = React;
 import { Varv, useProperty } from '#VarvReact';
 
 import { DynamicComponents, useDynamicModules } from '#Spatialstrates .dynamic-components';
@@ -9,42 +9,54 @@ import { CanvasView } from '#Spatialstrates .canvas-view';
 
 
 
+// Only these devices can be detected as XR platforms, so all others are known not to be one without waiting for WebXR
+const mightBeXRPlatform = () => {
+    return typeof window.HTMLModelElement !== 'undefined' ||
+        navigator.userAgent.includes('OculusBrowser') ||
+        navigator.userAgent.includes('Android');
+};
+
+// Detect the XR platform type once, so the GUI does not have to wait for it to be written to Varv
+const detectXRPlatform = async () => {
+    if (!navigator.xr || !mightBeXRPlatform()) return 'None';
+
+    const supportsImmersiveAR = !!navigator.xr && await navigator.xr.isSessionSupported('immersive-ar');
+    const supportsImmersiveVR = !!navigator.xr && await navigator.xr.isSessionSupported('immersive-vr');
+
+    const isAndroid = navigator.userAgent.includes('Android');
+    const isOculusBrowser = navigator.userAgent.includes('OculusBrowser');
+
+    const supportsModelElement = typeof window.HTMLModelElement !== 'undefined';
+
+    if (supportsModelElement && supportsImmersiveVR) return 'Vision Pro';
+    if (isOculusBrowser && supportsImmersiveVR) return 'Quest';
+    if (isAndroid && supportsImmersiveAR) return 'Android Mobile';
+    return 'None';
+};
+
+const xrPlatformPromise = detectXRPlatform().catch(() => 'None');
+
 function SpaceView() {
     const [currentView] = useProperty('currentView');
     const [currentSpace, setCurrentSpace] = useProperty('locationHash');
     const [, setXRPlatform] = useProperty('xrPlatform');
 
-    // Detect XR platform type
-    const initXRPlatformTimeout = useRef(null);
+    // Store the detected XR platform type
     useEffect(() => {
-        if (initXRPlatformTimeout.current) {
-            clearTimeout(initXRPlatformTimeout.current);
-            initXRPlatformTimeout.current = null;
-        }
+        if (typeof setXRPlatform !== 'function') return;
 
-        if (typeof setXRPlatform === 'function') {
-            initXRPlatformTimeout.current = setTimeout(async () => {
-                const supportsImmersiveAR = navigator.xr && await navigator.xr.isSessionSupported('immersive-ar');
-                const supportsImmersiveVR = navigator.xr && await navigator.xr.isSessionSupported('immersive-vr');
-
-                const isAndroid = navigator.userAgent.includes('Android')
-                const isOculusBrowser = navigator.userAgent.includes('OculusBrowser');
-
-                const supportsModelElement = typeof window.HTMLModelElement !== 'undefined';
-
-                if (supportsModelElement && supportsImmersiveVR) {
-                    setXRPlatform('Vision Pro');
-                } else if (isOculusBrowser && supportsImmersiveVR) {
-                    setXRPlatform('Quest');
-                } else if (isAndroid && supportsImmersiveAR) {
-                    setXRPlatform('Android Mobile');
-                } else {
-                    setXRPlatform('None');
-                }
-
-                initXRPlatformTimeout.current = null;
-            }, 1000);
-        }
+        let cancelled = false;
+        xrPlatformPromise.then(async xrPlatform => {
+            if (cancelled) return;
+            try {
+                await setXRPlatform(xrPlatform);
+            } catch (e) {
+                // The Varv binding may not be ready yet, the effect runs again with the next setter
+            }
+        });
+        return () => {
+            cancelled = true;
+        };
     }, [setXRPlatform]);
 
     // Initialize the current space if it is not set
@@ -88,7 +100,18 @@ function SpaceView() {
 
 // XR-capable devices only get the reduced XR GUI, all other devices get the full GUI
 function GUIComponents() {
-    const [xrPlatform] = useProperty('xrPlatform');
+    // Laptops get the full GUI immediately, XR-capable devices wait for detection
+    const [xrPlatform, setXRPlatform] = useState(() => mightBeXRPlatform() ? null : 'None');
+
+    useEffect(() => {
+        let cancelled = false;
+        xrPlatformPromise.then(detectedXRPlatform => {
+            if (!cancelled) setXRPlatform(detectedXRPlatform);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     if (!xrPlatform) return null;
     return xrPlatform === 'None'

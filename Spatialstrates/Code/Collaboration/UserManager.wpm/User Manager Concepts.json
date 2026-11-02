@@ -11,7 +11,10 @@
         },
         "User": {
             "schema": {
-                "name": "string"
+                "name": "string",
+                "claimedBy": { "string": {
+                    "default": ""
+                }}
             }
         }
     }

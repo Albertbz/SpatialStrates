@@ -1,5 +1,6 @@
 import React from 'react';
-let { useState, useEffect } = React;
+let { useState, useEffect, Suspense } = React;
+import { ErrorBoundary } from 'react-error-boundary';
 import { Cone, Gltf, useGLTF, Box, Billboard } from '@react-three/drei';
 import { Varv, useProperty } from '#VarvReact';
 
@@ -102,20 +103,29 @@ function AvatarModel() {
             {/* {type == 'camera' ? <group
                 onPointerDown={() => remoteControlCallback(true)}
                 onPointerUp={() => remoteControlCallback(false)}> */}
-            {model}
+            {/* Models and the name font load lazily, so a slow or failing download only affects this avatar */}
+            <ErrorBoundary fallback={null}>
+                <Suspense fallback={null}>
+                    {model}
+                </Suspense>
+            </ErrorBoundary>
             {/* </group> : model} */}
-            {type == 'camera' || type == 'cursor' ? <Billboard position={type == 'camera' ? [0, 0.11, 0] : [0, 0.05, 0.0]}>
-                <Text
-                    textAlign="center"
-                    anchorX="center"
-                    anchorY="middle"
-                    color="black"
-                    outlineWidth="5%"
-                    outlineColor="white"
-                    fontSize={0.05}>
-                    {userName}
-                </Text>
-            </Billboard> : null}
+            {type == 'camera' || type == 'cursor' ? <ErrorBoundary fallback={null}>
+                <Suspense fallback={null}>
+                    <Billboard position={type == 'camera' ? [0, 0.11, 0] : [0, 0.05, 0.0]}>
+                        <Text
+                            textAlign="center"
+                            anchorX="center"
+                            anchorY="middle"
+                            color="black"
+                            outlineWidth="5%"
+                            outlineColor="white"
+                            fontSize={0.05}>
+                            {userName}
+                        </Text>
+                    </Billboard>
+                </Suspense>
+            </ErrorBoundary> : null}
         </> : null}
         {AudioStream ? <Varv property="clientAudioStream">
             <AudioStream client={client} />

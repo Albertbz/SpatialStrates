@@ -143,8 +143,10 @@ function OwnUserOption({ ownUser, setOwnUser, localUser, setLocalUser, localAvat
             return;
         }
 
+        // Claim the user, so it is shown as in use to other devices
         const uuid = await VarvEngine.getConceptFromType('User').create(null, {
-            name: newName.trim() || DEFAULT_OWN_USER_NAME
+            name: newName.trim() || DEFAULT_OWN_USER_NAME,
+            claimedBy: webstrate.clientId
         });
         setOwnUser(uuid);
         await setLocalUser(uuid);

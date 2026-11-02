@@ -6,7 +6,7 @@ import { streamShare } from '#VideoStreamManager .default';
 
 
 
-function WebcamTile({ client, userName }) {
+function WebcamTile({ client, userName, inXR, partnerInXR }) {
     const videoRef = useRef(null);
 
     useEffect(() => {
@@ -56,6 +56,39 @@ function WebcamTile({ client, userName }) {
             height: '100%',
             objectFit: 'cover'
         }} />
+        {/* Headsets stop sending camera frames during an immersive session, so their stream turns black */}
+        {inXR && <div style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            color: '#ffffffcc',
+            backgroundColor: '#202020',
+            fontSize: '13px'
+        }}>
+            <span className="material-icons">view_in_ar</span>
+            In XR
+        </div>}
+        {/* The video comes from a laptop merged with a headset that is currently in XR */}
+        {!inXR && partnerInXR && <span style={{
+            position: 'absolute',
+            top: '6px',
+            left: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            color: 'white',
+            backgroundColor: '#000000aa',
+            fontSize: '11px'
+        }}>
+            <span className="material-icons" style={{ fontSize: '14px' }}>view_in_ar</span>
+            In XR
+        </span>}
         <span style={{
             position: 'absolute',
             left: '8px',
@@ -70,6 +103,8 @@ function WebcamTile({ client, userName }) {
         }}>{userName || client}</span>
     </div>;
 }
+
+const isInXR = (avatar) => avatar.deviceType === 'vr' || avatar.deviceType === 'ar';
 
 // Picks one stream per user, preferring XR devices, so 2D and XR show the same webcam tiles
 export function useWebcamTiles() {
@@ -140,10 +175,20 @@ export function useWebcamTiles() {
                     if (right.avatar.mergeRole === 'target') return 1;
                     return 0;
                 });
-                const selected = group.candidates.find(candidate => streamShare.clientStreams.has(candidate.client));
-                return selected && {
+                // Prefer a device outside of XR, as headsets only send black frames while immersive
+                const streaming = group.candidates.filter(candidate => streamShare.clientStreams.has(candidate.client));
+                const selected = streaming.find(candidate => !isInXR(candidate.avatar)) || streaming[0];
+                if (!selected) return null;
+
+                // The merged headset does not need to share video itself to be shown as in XR
+                const partner = selected.avatar.mergeState === 'merged'
+                    ? avatars.find(avatar => avatar.uuid === selected.avatar.pairedAvatar)
+                    : null;
+                return {
                     client: selected.client,
                     userName: selected.avatar.userName,
+                    inXR: isInXR(selected.avatar),
+                    partnerInXR: Boolean(partner && isInXR(partner)),
                     key: selected.client
                 };
             }).filter(Boolean);
@@ -186,7 +231,7 @@ function WebcamGrid() {
         overflow: 'auto',
         pointerEvents: 'none'
     }}>
-        {tiles.map(tile => <WebcamTile key={tile.key} client={tile.client} userName={tile.userName} />)}
+        {tiles.map(tile => <WebcamTile key={tile.key} client={tile.client} userName={tile.userName} inXR={tile.inXR} partnerInXR={tile.partnerInXR} />)}
     </div>;
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 const { useState, useEffect, useMemo, useRef, Suspense } = React;
-import { Vector3, Quaternion, VideoTexture, SRGBColorSpace } from 'three';
+import { Vector3, Quaternion, VideoTexture, CanvasTexture, SRGBColorSpace } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import { Plane } from '@react-three/drei';
@@ -54,31 +54,103 @@ function useStreamVideo(client) {
     return video;
 }
 
-function WebcamTile({ client, userName, position }) {
-    const video = useStreamVideo(client);
+function useStream(client) {
+    const [stream, setStream] = useState(() => streamShare.clientStreams.get(client) || null);
 
+    useEffect(() => {
+        const onAdded = (streamClient, addedStream) => {
+            if (streamClient === client) setStream(addedStream);
+        };
+        const onRemoved = (streamClient) => {
+            if (streamClient === client) setStream(null);
+        };
+
+        setStream(streamShare.clientStreams.get(client) || null);
+        streamShare.addStreamAddedListener(onAdded);
+        streamShare.addStreamRemovedListener(onRemoved);
+
+        return () => {
+            streamShare.removeStreamAddedListener(onAdded);
+            streamShare.removeStreamRemovedListener(onRemoved);
+        };
+    }, [client]);
+
+    return stream;
+}
+
+// Crops the video to fill the tile, like object-fit: cover in the 2D grid
+function cropToTile(texture, width, height) {
+    if (!width || !height) return;
+    const videoAspect = width / height;
+    if (videoAspect > TILE_ASPECT) {
+        texture.repeat.set(TILE_ASPECT / videoAspect, 1);
+    } else {
+        texture.repeat.set(1, videoAspect / TILE_ASPECT);
+    }
+    texture.offset.set((1 - texture.repeat.x) / 2, (1 - texture.repeat.y) / 2);
+}
+
+// The hidden video elements stop rendering frames once the page is behind an immersive session, so frames are read
+// straight from the stream's video track instead, which keeps decoding
+function useTrackTexture(stream) {
+    const [texture, setTexture] = useState(null);
+
+    useEffect(() => {
+        const track = stream?.getVideoTracks()[0];
+        if (!track || !window.MediaStreamTrackProcessor) return;
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const canvasTexture = new CanvasTexture(canvas);
+        canvasTexture.colorSpace = SRGBColorSpace;
+        const reader = new MediaStreamTrackProcessor({ track }).readable.getReader();
+        let cancelled = false;
+
+        const readFrames = async () => {
+            while (!cancelled) {
+                const { value: frame, done } = await reader.read();
+                if (done) break;
+                if (canvas.width !== frame.displayWidth || canvas.height !== frame.displayHeight) {
+                    canvas.width = frame.displayWidth;
+                    canvas.height = frame.displayHeight;
+                    // Resizing the canvas requires a new GPU texture
+                    canvasTexture.dispose();
+                    cropToTile(canvasTexture, canvas.width, canvas.height);
+                    setTexture(canvasTexture);
+                }
+                context.drawImage(frame, 0, 0);
+                frame.close();
+                canvasTexture.needsUpdate = true;
+            }
+        };
+        readFrames().catch(error => {
+            if (!cancelled) console.warn('Could not read webcam frames:', error);
+        });
+
+        return () => {
+            cancelled = true;
+            reader.cancel().catch(() => { });
+            canvasTexture.dispose();
+            setTexture(null);
+        };
+    }, [stream]);
+
+    return texture;
+}
+
+// Fallback for browsers without MediaStreamTrackProcessor, which only updates outside of immersive sessions
+function useVideoElementTexture(video) {
     const texture = useMemo(() => {
-        if (!video) return null;
+        if (!video || window.MediaStreamTrackProcessor) return null;
         const videoTexture = new VideoTexture(video);
         videoTexture.colorSpace = SRGBColorSpace;
         return videoTexture;
     }, [video]);
 
-    // Crop the video to fill the tile, like object-fit: cover in the 2D grid
     useEffect(() => {
         if (!video || !texture) return;
 
-        const updateCrop = () => {
-            if (!video.videoWidth || !video.videoHeight) return;
-            const videoAspect = video.videoWidth / video.videoHeight;
-            if (videoAspect > TILE_ASPECT) {
-                texture.repeat.set(TILE_ASPECT / videoAspect, 1);
-            } else {
-                texture.repeat.set(1, videoAspect / TILE_ASPECT);
-            }
-            texture.offset.set((1 - texture.repeat.x) / 2, (1 - texture.repeat.y) / 2);
-        };
-
+        const updateCrop = () => cropToTile(texture, video.videoWidth, video.videoHeight);
         updateCrop();
         video.addEventListener('loadedmetadata', updateCrop);
         video.addEventListener('resize', updateCrop);
@@ -90,6 +162,17 @@ function WebcamTile({ client, userName, position }) {
         };
     }, [video, texture]);
 
+    return texture;
+}
+
+function WebcamTile({ client, userName, inXR, partnerInXR, position }) {
+    const video = useStreamVideo(client);
+    const stream = useStream(client);
+    // Headsets stop sending camera frames during an immersive session, so their stream is not shown
+    const trackTexture = useTrackTexture(inXR ? null : stream);
+    const videoElementTexture = useVideoElementTexture(inXR ? null : video);
+    const texture = trackTexture || videoElementTexture;
+
     return <group position={position}>
         <Plane args={[TILE_WIDTH + TILE_BORDER * 2, TILE_HEIGHT + TILE_BORDER * 2]} position={[0, 0, -0.001]}>
             <meshBasicMaterial color="#636363" transparent opacity={0.44} />
@@ -99,6 +182,24 @@ function WebcamTile({ client, userName, position }) {
         </Plane>
         <ErrorBoundary fallback={null}>
             <Suspense fallback={null}>
+                {inXR && <Text
+                    position={[0, 0, 0.001]}
+                    anchorX="center"
+                    anchorY="middle"
+                    color="#ffffffcc"
+                    fontSize={0.01}>
+                    In XR
+                </Text>}
+                {!inXR && partnerInXR && <Text
+                    position={[-TILE_WIDTH / 2 + 0.008, TILE_HEIGHT / 2 - 0.006, 0.001]}
+                    anchorX="left"
+                    anchorY="top"
+                    color="white"
+                    outlineWidth="5%"
+                    outlineColor="black"
+                    fontSize={0.008}>
+                    In XR
+                </Text>}
                 <Text
                     position={[-TILE_WIDTH / 2 + 0.008, -TILE_HEIGHT / 2 + 0.006, 0.001]}
                     anchorX="left"
@@ -165,7 +266,7 @@ function WebcamGridScene() {
     // The group stays mounted while there are no tiles, so it keeps following the head
     return <group ref={groupRef} pointerEvents="none">
         <group position={GRID_OFFSET} rotation={[GRID_TILT, 0, 0]}>
-            {tiles.map((tile, index) => <WebcamTile key={tile.key} client={tile.client} userName={tile.userName} position={positions[index]} />)}
+            {tiles.map((tile, index) => <WebcamTile key={tile.key} client={tile.client} userName={tile.userName} inXR={tile.inXR} partnerInXR={tile.partnerInXR} position={positions[index]} />)}
         </group>
     </group>;
 }

@@ -3,8 +3,7 @@
     "dependencies": [
         "#StreamManager",
         "#VideoStreamManager",
-        "#Menu",
-        "#ControllerMenu"
+        "#Menu"
     ],
     "assets": [],
     "version": "0.3.1"

@@ -42,6 +42,10 @@
             background: hsl(34, 100%, 73%);
             order: -1;
         }
+
+        &.presenter {
+            border-color: hsl(14, 100%, 60%);
+        }
     }
 }
 

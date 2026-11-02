@@ -1,9 +1,85 @@
 import React from 'react';
 const { useState, useEffect } = React;
+import { Vector3, Quaternion, Euler } from 'three';
+import { create } from 'zustand';
 
 
 
 export const MERGE_SYNC_INTERVAL = 100;
+
+// How quickly the laptop camera catches up with the followed headset, avatar poses only arrive every few hundred milliseconds
+const FOLLOW_SMOOTHING = 6;
+
+const tempPosition = new Vector3();
+const tempQuaternion = new Quaternion();
+const tempEuler = new Euler(0, 0, 0, 'YXZ');
+const tempRotation = new Euler();
+
+export const isXRDeviceType = (deviceType) => deviceType === 'vr' || deviceType === 'ar';
+
+// Mouse look would fight with a followed view
+export const stopMouseLook = () => {
+    window.moduleCameraControls?.controlsRef?.current?.unlock?.();
+};
+
+// Moves the laptop camera smoothly towards a followed headset pose
+export const followPose = (cameraObject, position, rotation, delta) => {
+    // Head roll is dropped, as it is uncomfortable to watch on a screen
+    tempQuaternion.setFromEuler(tempRotation.set(rotation[0], rotation[1], rotation[2]));
+    tempEuler.setFromQuaternion(tempQuaternion, 'YXZ');
+    tempEuler.z = 0;
+    tempQuaternion.setFromEuler(tempEuler);
+
+    const alpha = 1 - Math.exp(-FOLLOW_SMOOTHING * delta);
+    cameraObject.position.lerp(tempPosition.fromArray(position), alpha);
+    cameraObject.quaternion.slerp(tempQuaternion, alpha);
+    cameraObject.updateMatrixWorld(true);
+};
+
+// Shared between the follow status GUI, which looks up the presenter, and the scene, which moves the camera
+export const useFollowStore = create(() => ({
+    status: 'none',
+    presenterName: '',
+    presenterClient: null,
+    position: null,
+    rotation: null
+}));
+
+// Returns the presenting user and their camera avatar while it is in VR or AR, or null when nobody is presenting
+export const getPresenterInfo = async () => {
+    const managers = await VarvEngine.lookupInstances('AvatarManager');
+    if (managers.length === 0) return null;
+    const presenterUser = await VarvEngine.getConceptFromType('AvatarManager').getPropertyValue(managers[0], 'presenterUser');
+    if (!presenterUser) return null;
+
+    const avatarConcept = VarvEngine.getConceptFromType('Avatar');
+    const userAvatars = await VarvEngine.lookupInstances('Avatar', FilterAction.constructFilter({
+        and: [
+            { property: 'user', equals: presenterUser },
+            { property: 'type', equals: 'camera' }
+        ]
+    }));
+
+    let presenterAvatar = null;
+    for (const avatar of userAvatars) {
+        if (!await avatarConcept.getPropertyValue(avatar, 'active')) continue;
+        if (!webstrate.clients.includes(await avatarConcept.getPropertyValue(avatar, 'client'))) continue;
+        if (!isXRDeviceType(await avatarConcept.getPropertyValue(avatar, 'deviceType'))) continue;
+        presenterAvatar = avatar;
+        break;
+    }
+
+    return {
+        user: presenterUser,
+        userName: await VarvEngine.getConceptFromType('User').getPropertyValue(presenterUser, 'name'),
+        avatar: presenterAvatar ? {
+            client: await avatarConcept.getPropertyValue(presenterAvatar, 'client'),
+            position: await avatarConcept.getPropertyValue(presenterAvatar, 'position'),
+            rotation: await avatarConcept.getPropertyValue(presenterAvatar, 'rotation'),
+            space: await avatarConcept.getPropertyValue(presenterAvatar, 'space')
+        } : null
+    };
+};
 
 // Returns the local camera avatar and its merge partner, or null when this device is not merged
 export const getMergeInfo = async () => {

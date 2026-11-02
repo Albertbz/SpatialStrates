@@ -8,7 +8,7 @@ import { unzipSync } from 'fflate';
 import { Varv, useProperty } from '#VarvReact';
 
 import { Text } from '#Spatialstrates .text';
-import { useMergePartnerClient } from '#Avatar .merge-helpers';
+import { useMergePartnerClient, useFollowStore } from '#Avatar .merge-helpers';
 
 
 
@@ -222,8 +222,9 @@ function AvatarInOtherContainer() {
     </group>;
 }
 
-function Avatar({ hiddenClient }) {
+function Avatar({ hiddenClient, hiddenCameraClient }) {
     const [client] = useProperty('client');
+    const [type] = useProperty('type');
     const [space] = useProperty('space');
     const [otherSpace] = useProperty('otherSpace');
     const [currentSpace] = useProperty('locationHash');
@@ -290,6 +291,8 @@ function Avatar({ hiddenClient }) {
     if (mergeState === 'merged' && mergeRole === 'source') return null;
     // The device this device is merged with is part of the same user, so it would only obstruct the view
     if (hiddenClient && client === hiddenClient) return null;
+    // The followed presenter's head is where the camera is, but their hands and controllers stay visible
+    if (hiddenCameraClient && client === hiddenCameraClient && type === 'camera') return null;
 
     return active && location ? <>
         {location == 'same' ? <AvatarInSameSpace /> : null}
@@ -320,10 +323,11 @@ function Avatar({ hiddenClient }) {
 
 function Avatars() {
     const partnerClient = useMergePartnerClient();
+    const followedClient = useFollowStore(state => state.status === 'following' ? state.presenterClient : null);
 
     return <>
         <Varv concept="Avatar" if="!isMine">
-            <Avatar hiddenClient={partnerClient} />
+            <Avatar hiddenClient={partnerClient} hiddenCameraClient={followedClient} />
         </Varv>
         {/* <Varv concept="Avatar" if="isMine">
             <AvatarRemoteController />

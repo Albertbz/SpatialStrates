@@ -5,16 +5,12 @@ import { useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import { Varv, useProperty } from '#VarvReact';
 
-import { getMergeInfo, MERGE_SYNC_INTERVAL } from '#Avatar .merge-helpers';
+import { getMergeInfo, followPose, stopMouseLook, useFollowStore, MERGE_SYNC_INTERVAL } from '#Avatar .merge-helpers';
 
 
-
-// How quickly the laptop camera catches up with the headset, avatar poses only arrive every few hundred milliseconds
-const FOLLOW_SMOOTHING = 6;
 
 const tempPosition = new Vector3();
 const tempQuaternion = new Quaternion();
-const tempEuler = new Euler(0, 0, 0, 'YXZ');
 const tempForward = new Vector3();
 const upAxis = new Vector3(0, 1, 0);
 
@@ -103,20 +99,10 @@ function MergeViewSync() {
 
         if (!following.current) {
             following.current = true;
-            // Mouse look would fight with the followed view
-            window.moduleCameraControls?.controlsRef?.current?.unlock?.();
+            stopMouseLook();
         }
 
-        // Head roll is dropped, as it is uncomfortable to watch on a screen
-        quaternionFromRotation(info.partner.rotation, tempQuaternion);
-        tempEuler.setFromQuaternion(tempQuaternion, 'YXZ');
-        tempEuler.z = 0;
-        tempQuaternion.setFromEuler(tempEuler);
-
-        const alpha = 1 - Math.exp(-FOLLOW_SMOOTHING * delta);
-        cameraObject.position.lerp(tempPosition.fromArray(info.partner.position), alpha);
-        cameraObject.quaternion.slerp(tempQuaternion, alpha);
-        cameraObject.updateMatrixWorld(true);
+        followPose(cameraObject, info.partner.position, info.partner.rotation, delta);
     };
 
     useFrame((_state, delta, frame) => {
@@ -133,8 +119,36 @@ function MergeViewSync() {
     return null;
 }
 
+// While following the presenter, the laptop camera moves along with the presenter's headset
+function FollowViewSync() {
+    const session = useXR((xr) => xr.session);
+    const following = useRef(false);
+
+    useFrame((_state, delta) => {
+        const { status, position, rotation } = useFollowStore.getState();
+        const cameraObject = window.moduleCameraControls?.getCameraObject?.();
+
+        if (session || status !== 'following' || !position || !rotation || !cameraObject) {
+            following.current = false;
+            return;
+        }
+
+        if (!following.current) {
+            following.current = true;
+            stopMouseLook();
+        }
+
+        followPose(cameraObject, position, rotation, delta);
+    }, -99);
+
+    return null;
+}
+
 export function Main() {
-    return <Varv concept="SpaceManager">
-        <MergeViewSync />
-    </Varv>;
+    return <>
+        <Varv concept="SpaceManager">
+            <MergeViewSync />
+        </Varv>
+        <FollowViewSync />
+    </>;
 }

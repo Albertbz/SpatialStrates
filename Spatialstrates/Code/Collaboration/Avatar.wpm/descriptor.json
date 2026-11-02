@@ -3,6 +3,7 @@
     "dependencies": [
         "varv-repos varv-signaling",
         "#Spatialstrates",
+        "#UserManager",
         "#Menu",
         "#ControllerMenu"
     ],

@@ -62,3 +62,42 @@
         }
     }
 }
+
+.follow-status {
+    @include heading-font;
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 6px 6px 12px;
+    border-radius: 20px;
+    user-select: none;
+    white-space: nowrap;
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    backdrop-filter: saturate(180%) blur(10px);
+    background: rgba(255, 255, 255, .60);
+    border: 1px solid #cccccc70;
+
+    .material-icons {
+        font-size: 18px;
+    }
+
+    button {
+        @include heading-font;
+        padding: 4px 12px;
+        border: 1px solid #cccccc70;
+        border-radius: 14px;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    &.following,
+    &.presenting {
+        background: hsla(14, 100%, 60%, .85);
+        color: #fff;
+    }
+}

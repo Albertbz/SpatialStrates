@@ -2,7 +2,14 @@
     "concepts": {
         "AvatarManager": {
             "schema": {
-                "enabled": "boolean"
+                "enabled": "boolean",
+                "presenterUser": "User",
+                "followPresenter": { "boolean": {
+                    "default": true
+                }}
+            },
+            "mappings": {
+                "followPresenter": [ "memory", "cauldron" ]
             }
         },
         "Avatar": {

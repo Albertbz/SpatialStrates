@@ -12,11 +12,14 @@ import {
     useStalePairCleanup,
     LocalAvatarReporter
 } from '#UserDisplay .pairing-helpers';
+import { isXRDeviceType } from '#Avatar .merge-helpers';
 
 
 
 function UserIcon({ localAvatar }) {
     const [localUser] = useProperty('localUser');
+    const [presenterUser, setPresenterUser] = useProperty('presenterUser'); // AvatarManager
+    const [, setFollowPresenter] = useProperty('followPresenter'); // AvatarManager
     const [locationHash] = useProperty('locationHash'); // SpaceManager
     const [xrPlatform] = useProperty('xrPlatform'); // SpaceManager
     const [space] = useProperty('space');
@@ -75,10 +78,28 @@ function UserIcon({ localAvatar }) {
         action = <button onClick={pairWithDevice} disabled={!localAvatar || localBusy} title={`Pair with ${name || 'this device'}`}>Pair</button>;
     }
 
-    return <div className={`user-icon ${localUser === user ? 'local-user' : ''}`}>
+    // Anyone in XR can be followed like the presenter of a video call
+    const isPresenter = !!user && presenterUser === user;
+    const canFollow = !!user && !isLocalAvatar && localUser !== user && isXRDeviceType(deviceType);
+
+    const followUser = (event) => {
+        event.stopPropagation();
+        setPresenterUser(user);
+        setFollowPresenter(true);
+    };
+
+    const stopPresenting = (event) => {
+        event.stopPropagation();
+        setPresenterUser('');
+    };
+
+    return <div className={`user-icon ${localUser === user ? 'local-user' : ''} ${isPresenter ? 'presenter' : ''}`}>
         <span>{name || ''}</span>
         <small>{deviceLabel}</small>
         {canPair && action}
+        {canFollow && (isPresenter
+            ? <button onClick={stopPresenting} title={`Stop following ${name || 'this user'} for everyone`}>Presenting</button>
+            : <button onClick={followUser} title={`Make everyone follow ${name || 'this user'}`}>Follow</button>)}
     </div>;
 }
 
@@ -99,7 +120,9 @@ function UserDisplay() {
 export function Main() {
     return <Varv concept="UserManager">
         <Varv concept="SpaceManager">
-            <UserDisplay />
+            <Varv concept="AvatarManager">
+                <UserDisplay />
+            </Varv>
         </Varv>
     </Varv>;
 }

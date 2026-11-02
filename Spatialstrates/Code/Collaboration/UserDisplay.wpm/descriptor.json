@@ -3,7 +3,8 @@
     "dependencies": [
         "varv-repos varv-signaling",
         "#Spatialstrates",
-        "#UserManager"
+        "#UserManager",
+        "#Avatar"
     ],
     "assets": [],
     "version": "0.3.1"

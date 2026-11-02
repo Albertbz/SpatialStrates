@@ -36,28 +36,41 @@ const detectXRPlatform = async () => {
 
 const xrPlatformPromise = detectXRPlatform().catch(() => 'None');
 
+const XR_PLATFORM_RETRY_DELAY = 500;
+
 function SpaceView() {
     const [currentView] = useProperty('currentView');
     const [currentSpace, setCurrentSpace] = useProperty('locationHash');
-    const [, setXRPlatform] = useProperty('xrPlatform');
+    const [storedXRPlatform, setXRPlatform] = useProperty('xrPlatform');
 
-    // Store the detected XR platform type
+    // The setter from useProperty changes on every render, so retries use the latest one through a ref
+    const setXRPlatformRef = useRef(setXRPlatform);
+    setXRPlatformRef.current = setXRPlatform;
+
+    // Store the detected XR platform type, avatars are only transmitted once it is set.
+    // The write is retried until it succeeds, as the Varv binding may not be ready yet,
+    // and repeated whenever the value is lost, e.g., after the Varv engine reloads.
     useEffect(() => {
-        if (typeof setXRPlatform !== 'function') return;
-
         let cancelled = false;
-        xrPlatformPromise.then(async xrPlatform => {
-            if (cancelled) return;
+        let retryTimeout = null;
+
+        const storeXRPlatform = async () => {
+            const xrPlatform = await xrPlatformPromise;
+            if (cancelled || storedXRPlatform === xrPlatform) return;
             try {
-                await setXRPlatform(xrPlatform);
+                if (typeof setXRPlatformRef.current !== 'function') throw new Error('Varv binding not ready');
+                await setXRPlatformRef.current(xrPlatform);
             } catch (e) {
-                // The Varv binding may not be ready yet, the effect runs again with the next setter
+                if (!cancelled) retryTimeout = setTimeout(storeXRPlatform, XR_PLATFORM_RETRY_DELAY);
             }
-        });
+        };
+
+        storeXRPlatform();
         return () => {
             cancelled = true;
+            clearTimeout(retryTimeout);
         };
-    }, [setXRPlatform]);
+    }, [storedXRPlatform]);
 
     // Initialize the current space if it is not set
     const initSpaceTimeout = useRef(null);

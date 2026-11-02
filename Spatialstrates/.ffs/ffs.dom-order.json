@@ -48,7 +48,7 @@
     ],
     "/Code/Core/InterFont.wpm": [
         "descriptor.json",
-        "Font Face.css",
+        "Font Loader.js",
         "Configuration.css"
     ],
     "/Code/Core/MaterialSymbolsFont.wpm": [

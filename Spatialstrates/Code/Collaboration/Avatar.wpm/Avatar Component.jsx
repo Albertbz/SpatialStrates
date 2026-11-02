@@ -2,6 +2,7 @@ import React from 'react';
 let { useState, useEffect, Suspense } = React;
 import { ErrorBoundary } from 'react-error-boundary';
 import { Cone, Gltf, useGLTF, Box, Billboard } from '@react-three/drei';
+import { unzipSync } from 'fflate';
 import { Varv, useProperty } from '#VarvReact';
 
 import { Text } from '#Spatialstrates .text';
@@ -16,19 +17,34 @@ if (Fragment.one('#AudioStream .default')) {
 }
 
 
-useGLTF.preload('avatar-models.zip/model-camera.glb');
-useGLTF.preload('avatar-models.zip/model-phone.glb');
-useGLTF.preload('avatar-models.zip/model-headset-quest.glb');
-useGLTF.preload('avatar-models.zip/model-headset-vision-pro.glb');
+// The server hangs when serving larger files from inside a zip asset, so the whole zip is downloaded and unpacked here
+const AVATAR_MODELS_ZIP = 'avatar-models.zip';
+const avatarModelUrls = {};
+try {
+    const response = await fetch(AVATAR_MODELS_ZIP);
+    if (!response.ok) throw new Error('Status ' + response.status);
+    const files = unzipSync(new Uint8Array(await response.arrayBuffer()));
+    Object.entries(files).forEach(([fileName, data]) => {
+        avatarModelUrls[fileName] = URL.createObjectURL(new Blob([data], { type: 'model/gltf-binary' }));
+    });
+} catch (e) {
+    console.warn('Could not unpack the avatar models, falling back to loading them individually:', e);
+}
+const avatarModelUrl = (fileName) => avatarModelUrls[fileName] || AVATAR_MODELS_ZIP + '/' + fileName;
+
+useGLTF.preload(avatarModelUrl('model-camera.glb'));
+useGLTF.preload(avatarModelUrl('model-phone.glb'));
+useGLTF.preload(avatarModelUrl('model-headset-quest.glb'));
+useGLTF.preload(avatarModelUrl('model-headset-vision-pro.glb'));
 useGLTF.preload('https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/meta-quest-touch-plus/left.glb');
 useGLTF.preload('https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/meta-quest-touch-plus/right.glb');
 useGLTF.preload('https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/generic-hand/left.glb');
 useGLTF.preload('https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/generic-hand/right.glb');
 
-const cameraModel = <Gltf src='avatar-models.zip/model-camera.glb' scale={1} rotation={[0, Math.PI, 0]} />;
-const phoneModel = <Gltf src='avatar-models.zip/model-phone.glb' scale={0.01} />;
-const headsetQuestModel = <Gltf src='avatar-models.zip/model-headset-quest.glb' scale={0.9} rotation={[0, Math.PI, 0]} position={[0, 0.04, 0.11]} />;
-const headsetVisionProModel = <Gltf src='avatar-models.zip/model-headset-vision-pro.glb' scale={0.32} rotation={[0, Math.PI / 2, 0]} position={[0, -0.01, 0.115]} />;
+const cameraModel = <Gltf src={avatarModelUrl('model-camera.glb')} scale={1} rotation={[0, Math.PI, 0]} />;
+const phoneModel = <Gltf src={avatarModelUrl('model-phone.glb')} scale={0.01} />;
+const headsetQuestModel = <Gltf src={avatarModelUrl('model-headset-quest.glb')} scale={0.9} rotation={[0, Math.PI, 0]} position={[0, 0.04, 0.11]} />;
+const headsetVisionProModel = <Gltf src={avatarModelUrl('model-headset-vision-pro.glb')} scale={0.32} rotation={[0, Math.PI / 2, 0]} position={[0, -0.01, 0.115]} />;
 
 const controllerLeftModel = <Gltf src='https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/meta-quest-touch-plus/left.glb' />;
 const controllerRightModel = <Gltf src='https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/meta-quest-touch-plus/right.glb' />;

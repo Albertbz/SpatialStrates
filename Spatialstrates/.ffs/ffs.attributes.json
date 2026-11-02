@@ -87,10 +87,10 @@
                         "data-type": "wpm/descriptor"
                     }
                 },
-                "Font Face.css": {
+                "Font Loader.js": {
                     "_attributes": {
                         "auto": "",
-                        "data-type": "text/css"
+                        "data-type": "text/javascript"
                     }
                 },
                 "Configuration.css": {

@@ -4,6 +4,7 @@
         "varv-repos varv-signaling",
         "#Spatialstrates",
         "#UserManager",
+        "#VideoStream",
         "#Menu",
         "#ControllerMenu"
     ],

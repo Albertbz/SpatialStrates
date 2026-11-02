@@ -16,6 +16,13 @@ function FollowPresenterToggleButton() {
     return <MenuButton onClick={() => setFollowPresenter(!followPresenter)} toggled={followPresenter ? 'true' : null}>Follow Presenter ({followPresenter ? 'On' : 'Off'})</MenuButton>;
 }
 
+// Shared for everyone: following laptops look out from their tile in the movable webcam grid instead of the presenter's view
+function FollowWebcamGridToggleButton() {
+    const [followTarget, setFollowTarget] = useProperty('followTarget');
+    const followGrid = followTarget === 'grid';
+    return <MenuButton onClick={() => setFollowTarget(followGrid ? 'view' : 'grid')} toggled={followGrid ? 'true' : null}>Follow Webcam Grid ({followGrid ? 'On' : 'Off'})</MenuButton>;
+}
+
 function StopPresentingButton() {
     const [presenterUser, setPresenterUser] = useProperty('presenterUser');
     return presenterUser ? <MenuButton onClick={() => setPresenterUser('')}>Stop Presenting</MenuButton> : null;
@@ -29,6 +36,9 @@ addItemToSubMenu('media-sharing', 'avatars', <Varv concept="AvatarManager">
 addItemToSubMenu('media-sharing', 'follow-presenter', <Varv concept="AvatarManager">
     <FollowPresenterToggleButton />
 </Varv>, 760);
+addItemToSubMenu('media-sharing', 'follow-webcam-grid', <Varv concept="AvatarManager">
+    <FollowWebcamGridToggleButton />
+</Varv>, 765);
 addItemToSubMenu('media-sharing', 'stop-presenting', <Varv concept="AvatarManager">
     <StopPresentingButton />
 </Varv>, 770);
@@ -56,6 +66,12 @@ function PresentMyViewControllerButton() {
     return <ControllerMenuButton onClick={togglePresenting} toggled={presenting ? 'true' : null}>Present My View ({presenting ? 'On' : 'Off'})</ControllerMenuButton>;
 }
 
+function FollowWebcamGridToggleControllerButton() {
+    const [followTarget, setFollowTarget] = useProperty('followTarget');
+    const followGrid = followTarget === 'grid';
+    return <ControllerMenuButton onClick={() => setFollowTarget(followGrid ? 'view' : 'grid')} toggled={followGrid ? 'true' : null}>Laptops Follow Grid ({followGrid ? 'On' : 'Off'})</ControllerMenuButton>;
+}
+
 addControllerSubMenu('media-sharing', 500, false);
 addItemToControllerSubMenu('media-sharing', 'title', <ControllerMenuTitle title="Media Sharing" />, 0);
 addItemToControllerSubMenu('media-sharing', 'avatars', <Varv concept="AvatarManager">
@@ -66,3 +82,6 @@ addItemToControllerSubMenu('media-sharing', 'present-my-view', <Varv concept="Us
         <PresentMyViewControllerButton />
     </Varv>
 </Varv>, 760);
+addItemToControllerSubMenu('media-sharing', 'follow-webcam-grid', <Varv concept="AvatarManager">
+    <FollowWebcamGridToggleControllerButton />
+</Varv>, 765);

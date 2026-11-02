@@ -3,6 +3,7 @@ const { useEffect, useRef } = React;
 import { Varv, useProperty } from '#VarvReact';
 
 import { getMergeInfo, getPresenterInfo, isXRDeviceType, useFollowStore, MERGE_SYNC_INTERVAL } from '#Avatar .merge-helpers';
+import { getWebcamGridViewpoint } from '#VideoStream .webcam-grid-scene';
 
 
 
@@ -54,14 +55,15 @@ function useFollowPresenter() {
     const [currentView] = useProperty('currentView'); // SpaceManager
     const [locationHash, setLocationHash] = useProperty('locationHash'); // SpaceManager
     const [followPresenter] = useProperty('followPresenter'); // AvatarManager
+    const [followTarget] = useProperty('followTarget'); // AvatarManager
 
     const stateRef = useRef({});
-    stateRef.current = { localUser, currentView, locationHash, followPresenter, setLocationHash };
+    stateRef.current = { localUser, currentView, locationHash, followPresenter, followTarget, setLocationHash };
 
     useEffect(() => {
         let running = false;
         const update = async () => {
-            const { localUser, currentView, locationHash, followPresenter, setLocationHash } = stateRef.current;
+            const { localUser, currentView, locationHash, followPresenter, followTarget, setLocationHash } = stateRef.current;
             const presenter = await getPresenterInfo();
             const mergeInfo = await getMergeInfo();
             const avatarConcept = VarvEngine.getConceptFromType('Avatar');
@@ -84,7 +86,7 @@ function useFollowPresenter() {
                 status = 'following';
             }
 
-            // Others hide the avatar of a following laptop, as it sits right in the presenter's head
+            // Others hide the avatar of a following laptop, as it sits in the presenter's head or in front of its tile
             if (localAvatar && await avatarConcept.getPropertyValue(localAvatar, 'followingPresenter') !== (status === 'following')) {
                 await avatarConcept.setPropertyValue(localAvatar, 'followingPresenter', status === 'following');
             }
@@ -94,12 +96,19 @@ function useFollowPresenter() {
                 setLocationHash(presenter.avatar.space);
             }
 
+            // Laptops can look out from their tile in the movable webcam grid instead of from the presenter's head
+            const gridViewpoint = status === 'following' && followTarget === 'grid'
+                ? await getWebcamGridViewpoint(presenter.avatar.space, webstrate.clientId)
+                : null;
+
             useFollowStore.setState({
                 status,
+                target: gridViewpoint ? 'grid' : 'view',
+                gridMissing: followTarget === 'grid' && !gridViewpoint,
                 presenterName: presenter?.userName || '',
                 presenterClient: presenter?.avatar?.client || null,
-                position: presenter?.avatar?.position || null,
-                rotation: presenter?.avatar?.rotation || null
+                position: gridViewpoint?.position || presenter?.avatar?.position || null,
+                rotation: gridViewpoint?.rotation || presenter?.avatar?.rotation || null
             });
         };
 
@@ -127,6 +136,8 @@ function FollowStatus() {
     useFollowPresenter();
     const status = useFollowStore(state => state.status);
     const presenterName = useFollowStore(state => state.presenterName) || 'Someone';
+    const target = useFollowStore(state => state.target);
+    const gridMissing = useFollowStore(state => state.gridMissing);
     const [, setFollowPresenter] = useProperty('followPresenter');
     const [, setPresenterUser] = useProperty('presenterUser');
     const [, setCurrentView] = useProperty('currentView');
@@ -151,7 +162,13 @@ function FollowStatus() {
             action = <button onClick={() => setCurrentView('3D')}>Switch to 3D</button>;
             break;
         case 'following':
-            message = `Following ${presenterName}`;
+            if (target === 'grid') {
+                message = 'Following the webcam grid';
+            } else if (gridMissing) {
+                message = `Following ${presenterName} (no movable webcam grid)`;
+            } else {
+                message = `Following ${presenterName}`;
+            }
             action = <button onClick={() => setFollowPresenter(false)}>Stop Following</button>;
             break;
         default:

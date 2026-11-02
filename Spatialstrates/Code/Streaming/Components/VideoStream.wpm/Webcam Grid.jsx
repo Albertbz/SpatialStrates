@@ -108,92 +108,97 @@ export function WebcamTile({ client, userName, inXR, partnerInXR, style }) {
 const isInXR = (avatar) => avatar.deviceType === 'vr' || avatar.deviceType === 'ar';
 
 // Picks one stream per user, preferring XR devices, so 2D and XR show the same webcam tiles
+export async function loadWebcamTiles() {
+    const videoConcept = VarvEngine.getConceptFromType('VideoStream');
+    const avatarConcept = VarvEngine.getConceptFromType('Avatar');
+    const videoInstances = await VarvEngine.lookupInstances('VideoStream');
+    const avatarInstances = await VarvEngine.lookupInstances('Avatar');
+    const avatars = [];
+
+    for (const avatar of avatarInstances) {
+        if (await avatarConcept.getPropertyValue(avatar, 'type') !== 'camera') continue;
+        if (!await avatarConcept.getPropertyValue(avatar, 'active')) continue;
+        avatars.push({
+            uuid: avatar,
+            client: await avatarConcept.getPropertyValue(avatar, 'client'),
+            user: await avatarConcept.getPropertyValue(avatar, 'user'),
+            userName: await avatarConcept.getPropertyValue(avatar, 'userName'),
+            pairedAvatar: await avatarConcept.getPropertyValue(avatar, 'pairedAvatar'),
+            mergeState: await avatarConcept.getPropertyValue(avatar, 'mergeState'),
+            mergeRole: await avatarConcept.getPropertyValue(avatar, 'mergeRole'),
+            deviceType: await avatarConcept.getPropertyValue(avatar, 'deviceType'),
+            deviceClass: await avatarConcept.getPropertyValue(avatar, 'deviceClass'),
+            view: await avatarConcept.getPropertyValue(avatar, 'view')
+        });
+    }
+
+    const avatarByClient = new Map();
+    for (const avatar of avatars) {
+        const existing = avatarByClient.get(avatar.client);
+        if (!existing || (existing.deviceType === 'browser' && avatar.deviceType !== 'browser')) {
+            avatarByClient.set(avatar.client, avatar);
+        }
+    }
+    const groups = new Map();
+    for (const instance of videoInstances) {
+        const client = await videoConcept.getPropertyValue(instance, 'client');
+        const avatar = avatarByClient.get(client);
+        if (!avatar) continue;
+
+        const isMerged = avatar.mergeState === 'merged' && avatar.pairedAvatar;
+        const groupKey = isMerged ? [avatar.uuid, avatar.pairedAvatar].sort().join(':') : client;
+        const group = groups.get(groupKey) || { candidates: [] };
+        group.candidates.push({ client, avatar });
+        groups.set(groupKey, group);
+    }
+
+    const nextTiles = [...groups.values()].map(group => {
+        group.candidates.sort((left, right) => {
+            const devicePriority = { browser: 0, ar: 1, vr: 1 };
+            const leftDevicePriority = devicePriority[left.avatar.deviceType] ?? 0;
+            const rightDevicePriority = devicePriority[right.avatar.deviceType] ?? 0;
+            if (leftDevicePriority !== rightDevicePriority) {
+                return rightDevicePriority - leftDevicePriority;
+            }
+            if (left.avatar.deviceType === 'browser') {
+                const leftClassPriority = left.avatar.deviceClass === 'laptop' ? 1 : 0;
+                const rightClassPriority = right.avatar.deviceClass === 'laptop' ? 1 : 0;
+                if (leftClassPriority !== rightClassPriority) {
+                    return rightClassPriority - leftClassPriority;
+                }
+            }
+            if (left.avatar.mergeRole === 'target') return -1;
+            if (right.avatar.mergeRole === 'target') return 1;
+            return 0;
+        });
+        // Prefer a device outside of XR, as headsets only send black frames while immersive
+        const streaming = group.candidates.filter(candidate => streamShare.clientStreams.has(candidate.client));
+        const selected = streaming.find(candidate => !isInXR(candidate.avatar)) || streaming[0];
+        if (!selected) return null;
+
+        // The merged headset does not need to share video itself to be shown as in XR
+        const partner = selected.avatar.mergeState === 'merged'
+            ? avatars.find(avatar => avatar.uuid === selected.avatar.pairedAvatar)
+            : null;
+        return {
+            client: selected.client,
+            userName: selected.avatar.userName,
+            inXR: isInXR(selected.avatar),
+            partnerInXR: Boolean(partner && isInXR(partner)),
+            key: selected.client
+        };
+    }).filter(Boolean);
+
+    return nextTiles;
+}
+
 export function useWebcamTiles() {
     const [tiles, setTiles] = useState([]);
 
     useEffect(() => {
         let cancelled = false;
         const refreshTiles = async () => {
-            const videoConcept = VarvEngine.getConceptFromType('VideoStream');
-            const avatarConcept = VarvEngine.getConceptFromType('Avatar');
-            const videoInstances = await VarvEngine.lookupInstances('VideoStream');
-            const avatarInstances = await VarvEngine.lookupInstances('Avatar');
-            const avatars = [];
-
-            for (const avatar of avatarInstances) {
-                if (await avatarConcept.getPropertyValue(avatar, 'type') !== 'camera') continue;
-                if (!await avatarConcept.getPropertyValue(avatar, 'active')) continue;
-                avatars.push({
-                    uuid: avatar,
-                    client: await avatarConcept.getPropertyValue(avatar, 'client'),
-                    user: await avatarConcept.getPropertyValue(avatar, 'user'),
-                    userName: await avatarConcept.getPropertyValue(avatar, 'userName'),
-                    pairedAvatar: await avatarConcept.getPropertyValue(avatar, 'pairedAvatar'),
-                    mergeState: await avatarConcept.getPropertyValue(avatar, 'mergeState'),
-                    mergeRole: await avatarConcept.getPropertyValue(avatar, 'mergeRole'),
-                    deviceType: await avatarConcept.getPropertyValue(avatar, 'deviceType'),
-                    deviceClass: await avatarConcept.getPropertyValue(avatar, 'deviceClass'),
-                    view: await avatarConcept.getPropertyValue(avatar, 'view')
-                });
-            }
-
-            const avatarByClient = new Map();
-            for (const avatar of avatars) {
-                const existing = avatarByClient.get(avatar.client);
-                if (!existing || (existing.deviceType === 'browser' && avatar.deviceType !== 'browser')) {
-                    avatarByClient.set(avatar.client, avatar);
-                }
-            }
-            const groups = new Map();
-            for (const instance of videoInstances) {
-                const client = await videoConcept.getPropertyValue(instance, 'client');
-                const avatar = avatarByClient.get(client);
-                if (!avatar) continue;
-
-                const isMerged = avatar.mergeState === 'merged' && avatar.pairedAvatar;
-                const groupKey = isMerged ? [avatar.uuid, avatar.pairedAvatar].sort().join(':') : client;
-                const group = groups.get(groupKey) || { candidates: [] };
-                group.candidates.push({ client, avatar });
-                groups.set(groupKey, group);
-            }
-
-            const nextTiles = [...groups.values()].map(group => {
-                group.candidates.sort((left, right) => {
-                    const devicePriority = { browser: 0, ar: 1, vr: 1 };
-                    const leftDevicePriority = devicePriority[left.avatar.deviceType] ?? 0;
-                    const rightDevicePriority = devicePriority[right.avatar.deviceType] ?? 0;
-                    if (leftDevicePriority !== rightDevicePriority) {
-                        return rightDevicePriority - leftDevicePriority;
-                    }
-                    if (left.avatar.deviceType === 'browser') {
-                        const leftClassPriority = left.avatar.deviceClass === 'laptop' ? 1 : 0;
-                        const rightClassPriority = right.avatar.deviceClass === 'laptop' ? 1 : 0;
-                        if (leftClassPriority !== rightClassPriority) {
-                            return rightClassPriority - leftClassPriority;
-                        }
-                    }
-                    if (left.avatar.mergeRole === 'target') return -1;
-                    if (right.avatar.mergeRole === 'target') return 1;
-                    return 0;
-                });
-                // Prefer a device outside of XR, as headsets only send black frames while immersive
-                const streaming = group.candidates.filter(candidate => streamShare.clientStreams.has(candidate.client));
-                const selected = streaming.find(candidate => !isInXR(candidate.avatar)) || streaming[0];
-                if (!selected) return null;
-
-                // The merged headset does not need to share video itself to be shown as in XR
-                const partner = selected.avatar.mergeState === 'merged'
-                    ? avatars.find(avatar => avatar.uuid === selected.avatar.pairedAvatar)
-                    : null;
-                return {
-                    client: selected.client,
-                    userName: selected.avatar.userName,
-                    inXR: isInXR(selected.avatar),
-                    partnerInXR: Boolean(partner && isInXR(partner)),
-                    key: selected.client
-                };
-            }).filter(Boolean);
-
+            const nextTiles = await loadWebcamTiles();
             if (!cancelled) setTiles(nextTiles);
         };
 

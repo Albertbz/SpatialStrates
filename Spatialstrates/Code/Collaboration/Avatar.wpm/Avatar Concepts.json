@@ -6,6 +6,10 @@
                 "presenterUser": "User",
                 "followPresenter": { "boolean": {
                     "default": true
+                }},
+                "followTarget": { "string": {
+                    "enum": [ "view", "grid" ],
+                    "default": "view"
                 }}
             },
             "mappings": {

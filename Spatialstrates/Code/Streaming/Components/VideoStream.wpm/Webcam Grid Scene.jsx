@@ -1,6 +1,6 @@
 import React from 'react';
 const { useState, useEffect, useMemo, useRef, Suspense } = React;
-import { Vector3, Quaternion, VideoTexture, CanvasTexture, SRGBColorSpace } from 'three';
+import { Vector3, Quaternion, Euler, VideoTexture, CanvasTexture, SRGBColorSpace } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import { Plane } from '@react-three/drei';
@@ -9,7 +9,7 @@ import { Varv, useProperty } from '#VarvReact';
 
 import { Text } from '#Spatialstrates .text';
 import { QUERY_PREFIX, streamShare } from '#VideoStreamManager .default';
-import { useWebcamTiles } from '#VideoStream .webcam-grid';
+import { useWebcamTiles, loadWebcamTiles } from '#VideoStream .webcam-grid';
 
 
 
@@ -24,6 +24,10 @@ const MAX_COLUMNS = 4;
 const GRID_OFFSET = [0, -0.28, -0.9];
 const GRID_TILT = 0.3;
 const FOLLOW_SPEED = 4;
+
+// How far in front of its tile a laptop following the grid looks out from
+const VIEWPOINT_DISTANCE = 0.02;
+const turnAroundQuaternion = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), Math.PI);
 
 const tempPosition = new Vector3();
 const tempQuaternion = new Quaternion();
@@ -244,6 +248,46 @@ export function getGridSize(count) {
         columns * TILE_WIDTH + Math.max(columns - 1, 0) * TILE_GAP,
         rows * TILE_HEIGHT + Math.max(rows - 1, 0) * TILE_GAP
     ];
+}
+
+// Where a laptop looks out from the movable webcam grid in a space, from its own tile if it has one, or null without a grid
+export async function getWebcamGridViewpoint(space, client) {
+    const managers = await VarvEngine.lookupInstances('WebcamGridManager');
+    if (managers.length === 0) return null;
+    if (await VarvEngine.getConceptFromType('WebcamGridManager').getPropertyValue(managers[0], 'mode') !== 'movable') return null;
+
+    const gridConcept = VarvEngine.getConceptFromType('WebcamGrid');
+    let grid = null;
+    for (const uuid of await VarvEngine.lookupInstances('WebcamGrid')) {
+        if (await gridConcept.getPropertyValue(uuid, 'space') === space) {
+            grid = uuid;
+            break;
+        }
+    }
+    if (!grid) return null;
+
+    // The movable grid centers its tiles vertically, see the Webcam Grid Component
+    const tiles = await loadWebcamTiles();
+    const index = tiles.findIndex(tile => tile.client === client);
+    const position = new Vector3(0, 0, VIEWPOINT_DISTANCE);
+    if (index >= 0) {
+        const [x, y] = getTilePositions(tiles.length)[index];
+        const [, height] = getGridSize(tiles.length);
+        position.x = x;
+        position.y = y - height / 2;
+    }
+
+    const gridPosition = await gridConcept.getPropertyValue(grid, 'position');
+    const gridRotation = await gridConcept.getPropertyValue(grid, 'rotation');
+    const quaternion = new Quaternion().setFromEuler(new Euler(gridRotation[0], gridRotation[1], gridRotation[2]));
+    position.applyQuaternion(quaternion).add(new Vector3(gridPosition[0], gridPosition[1], gridPosition[2]));
+
+    // The tiles face the room, so the camera is turned around to look the same way
+    const rotation = new Euler().setFromQuaternion(quaternion.multiply(turnAroundQuaternion));
+    return {
+        position: position.toArray(),
+        rotation: [rotation.x, rotation.y, rotation.z]
+    };
 }
 
 export function WebcamGridTiles({ tiles }) {

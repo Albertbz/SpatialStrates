@@ -41,6 +41,8 @@ export const followPose = (cameraObject, position, rotation, delta) => {
 if (!window.moduleFollowStore) {
     window.moduleFollowStore = create(() => ({
         status: 'none',
+        target: 'view',
+        gridMissing: false,
         presenterName: '',
         presenterClient: null,
         position: null,

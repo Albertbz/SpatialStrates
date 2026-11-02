@@ -326,7 +326,8 @@ function Avatar({ hiddenClient, hiddenCameraClient }) {
 
 function Avatars() {
     const partnerClient = useMergePartnerClient();
-    const followedClient = useFollowStore(state => state.status === 'following' ? state.presenterClient : null);
+    // Only while following the presenter's view is their head where the camera is
+    const followedClient = useFollowStore(state => state.status === 'following' && state.target === 'view' ? state.presenterClient : null);
 
     return <>
         <Varv concept="Avatar" if="!isMine">

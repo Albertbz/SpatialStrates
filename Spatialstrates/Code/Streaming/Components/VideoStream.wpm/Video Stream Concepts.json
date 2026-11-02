@@ -4,6 +4,20 @@
             "schema": {
                 "client": "string"
             }
+        },
+        "WebcamGridManager": {
+            "schema": {
+                "mode": { "string": {
+                    "enum": [ "head", "movable" ],
+                    "default": "head"
+                }}
+            }
+        },
+        "WebcamGrid": {
+            "schema": {},
+            "extensions": {
+                "inject": [ "Movable" ]
+            }
         }
     }
 }

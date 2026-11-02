@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import { Plane } from '@react-three/drei';
 import { ErrorBoundary } from 'react-error-boundary';
+import { Varv, useProperty } from '#VarvReact';
 
 import { Text } from '#Spatialstrates .text';
 import { QUERY_PREFIX, streamShare } from '#VideoStreamManager .default';
@@ -236,6 +237,21 @@ function getTilePositions(count) {
     return positions;
 }
 
+export function getGridSize(count) {
+    const columns = Math.min(count, MAX_COLUMNS);
+    const rows = Math.ceil(count / MAX_COLUMNS);
+    return [
+        columns * TILE_WIDTH + Math.max(columns - 1, 0) * TILE_GAP,
+        rows * TILE_HEIGHT + Math.max(rows - 1, 0) * TILE_GAP
+    ];
+}
+
+export function WebcamGridTiles({ tiles }) {
+    const positions = useMemo(() => getTilePositions(tiles.length), [tiles.length]);
+
+    return tiles.map((tile, index) => <WebcamTile key={tile.key} client={tile.client} userName={tile.userName} inXR={tile.inXR} partnerInXR={tile.partnerInXR} position={positions[index]} />);
+}
+
 function WebcamGridScene() {
     const tiles = useWebcamTiles();
     const groupRef = useRef(null);
@@ -261,12 +277,10 @@ function WebcamGridScene() {
         group.quaternion.slerp(tempQuaternion, alpha);
     });
 
-    const positions = useMemo(() => getTilePositions(tiles.length), [tiles.length]);
-
     // The group stays mounted while there are no tiles, so it keeps following the head
     return <group ref={groupRef} pointerEvents="none">
         <group position={GRID_OFFSET} rotation={[GRID_TILT, 0, 0]}>
-            {tiles.map((tile, index) => <WebcamTile key={tile.key} client={tile.client} userName={tile.userName} inXR={tile.inXR} partnerInXR={tile.partnerInXR} position={positions[index]} />)}
+            <WebcamGridTiles tiles={tiles} />
         </group>
     </group>;
 }
@@ -274,11 +288,15 @@ function WebcamGridScene() {
 // The 2D webcam grid cannot be seen in an immersive session, so the same tiles are shown in the scene instead
 function XRWebcamGrid() {
     const session = useXR((xr) => xr.session);
-    return session ? <WebcamGridScene /> : null;
+    const [mode] = useProperty('mode');
+    // In movable mode the grid is shown by the Webcam Grid movable instead
+    return session && mode !== 'movable' ? <WebcamGridScene /> : null;
 }
 
 export function Main() {
     return <ErrorBoundary fallback={null}>
-        <XRWebcamGrid />
+        <Varv concept="WebcamGridManager">
+            <XRWebcamGrid />
+        </Varv>
     </ErrorBoundary>;
 }

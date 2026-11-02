@@ -1,9 +1,11 @@
 {
     "description": "Stream component for video streams.",
     "dependencies": [
+        "#Spatialstrates",
         "#StreamManager",
         "#VideoStreamManager",
-        "#Menu"
+        "#Menu",
+        "#ControllerMenu"
     ],
     "assets": [],
     "version": "0.3.1"

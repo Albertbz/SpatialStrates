@@ -854,7 +854,25 @@
                     "Webcam Grid Scene.jsx": {
                         "_attributes": {
                             "data-type": "text/javascript+babel",
-                            "class": "dynamic-scene-component"
+                            "class": "webcam-grid-scene dynamic-scene-component"
+                        }
+                    },
+                    "Webcam Grid Component.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-movable-scene-component"
+                        }
+                    },
+                    "Init Manager Concept.js": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/javascript"
+                        }
+                    },
+                    "Webcam Grid Shape.jsx": {
+                        "_attributes": {
+                            "data-type": "text/javascript+babel",
+                            "class": "dynamic-shape-component"
                         }
                     }
                 },

@@ -6,7 +6,7 @@ import { streamShare } from '#VideoStreamManager .default';
 
 
 
-function WebcamTile({ client, userName, inXR, partnerInXR }) {
+export function WebcamTile({ client, userName, inXR, partnerInXR, style }) {
     const videoRef = useRef(null);
 
     useEffect(() => {
@@ -49,7 +49,8 @@ function WebcamTile({ client, userName, inXR, partnerInXR }) {
         borderRadius: '8px',
         backgroundColor: '#202020',
         boxShadow: '0 2px 8px #00000055',
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        ...style
     }}>
         <video ref={videoRef} autoPlay muted playsInline style={{
             width: '100%',

@@ -248,7 +248,10 @@
         "Video Stream Component.jsx",
         "Video Stream Menu.jsx",
         "Webcam Grid.jsx",
-        "Webcam Grid Scene.jsx"
+        "Webcam Grid Scene.jsx",
+        "Webcam Grid Component.jsx",
+        "Init Manager Concept.js",
+        "Webcam Grid Shape.jsx"
     ],
     "/Code/Streaming/Components/AudioStream.wpm": [
         "descriptor.json",

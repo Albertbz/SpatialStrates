@@ -225,6 +225,7 @@ function AvatarInOtherContainer() {
 function Avatar({ hiddenClient, hiddenCameraClient }) {
     const [client] = useProperty('client');
     const [type] = useProperty('type');
+    const [followingPresenter] = useProperty('followingPresenter');
     const [space] = useProperty('space');
     const [otherSpace] = useProperty('otherSpace');
     const [currentSpace] = useProperty('locationHash');
@@ -293,6 +294,8 @@ function Avatar({ hiddenClient, hiddenCameraClient }) {
     if (hiddenClient && client === hiddenClient) return null;
     // The followed presenter's head is where the camera is, but their hands and controllers stay visible
     if (hiddenCameraClient && client === hiddenCameraClient && type === 'camera') return null;
+    // Laptops following the presenter would clip into the presenter's head and into each other
+    if (followingPresenter && type === 'camera') return null;
 
     return active && location ? <>
         {location == 'same' ? <AvatarInSameSpace /> : null}

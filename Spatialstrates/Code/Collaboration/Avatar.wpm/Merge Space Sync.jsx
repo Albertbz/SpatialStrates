@@ -38,15 +38,14 @@ function MergeSpaceSync() {
     return null;
 }
 
-const getLocalDeviceType = async () => {
+const getLocalCameraAvatar = async () => {
     const localAvatars = await VarvEngine.lookupInstances('Avatar', FilterAction.constructFilter({
         and: [
             { property: 'client', equals: webstrate.clientId },
             { property: 'type', equals: 'camera' }
         ]
     }));
-    if (!localAvatars[0]) return null;
-    return VarvEngine.getConceptFromType('Avatar').getPropertyValue(localAvatars[0], 'deviceType');
+    return localAvatars[0] || null;
 };
 
 // Decides whether this device follows the presenter, and keeps it in the presenter's space while it does
@@ -65,7 +64,9 @@ function useFollowPresenter() {
             const { localUser, currentView, locationHash, followPresenter, setLocationHash } = stateRef.current;
             const presenter = await getPresenterInfo();
             const mergeInfo = await getMergeInfo();
-            const localDeviceType = await getLocalDeviceType();
+            const avatarConcept = VarvEngine.getConceptFromType('Avatar');
+            const localAvatar = await getLocalCameraAvatar();
+            const localDeviceType = localAvatar ? await avatarConcept.getPropertyValue(localAvatar, 'deviceType') : null;
 
             let status;
             if (!presenter || isXRDeviceType(localDeviceType) || mergeInfo?.localRole === 'source') {
@@ -81,6 +82,11 @@ function useFollowPresenter() {
                 status = 'view2D';
             } else {
                 status = 'following';
+            }
+
+            // Others hide the avatar of a following laptop, as it sits right in the presenter's head
+            if (localAvatar && await avatarConcept.getPropertyValue(localAvatar, 'followingPresenter') !== (status === 'following')) {
+                await avatarConcept.setPropertyValue(localAvatar, 'followingPresenter', status === 'following');
             }
 
             const following = ['following', 'view2D'].includes(status);

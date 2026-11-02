@@ -1,6 +1,8 @@
 import React from 'react';
-let { useState, useEffect, Suspense } = React;
+let { useState, useEffect, useRef, Suspense } = React;
 import { ErrorBoundary } from 'react-error-boundary';
+import { Vector3, Quaternion, Euler } from 'three';
+import { useFrame } from '@react-three/fiber';
 import { Cone, Gltf, useGLTF, Box, Billboard } from '@react-three/drei';
 import { unzipSync } from 'fflate';
 import { Varv, useProperty } from '#VarvReact';
@@ -54,6 +56,13 @@ const handRightModel = <Gltf src='https://cdn.jsdelivr.net/npm/@webxr-input-prof
 const viewCone = <Cone args={[0.1, 0.1, 32]} position={[0, 0, -0.05]} rotation={[Math.PI / 2, 0, 0]}>
     <meshStandardMaterial color="skyblue" transparent={true} opacity={0.66} />
 </Cone>;
+
+// How quickly avatars catch up with their latest synced pose, poses only arrive every 100 milliseconds
+const POSE_SMOOTHING = 15;
+
+const tempPosition = new Vector3();
+const tempQuaternion = new Quaternion();
+const tempEuler = new Euler();
 
 const cursorModel = <Box args={[0.005, 0.005, 2]} position={[0, 0, 0]}>
     <meshBasicMaterial color="skyblue" />
@@ -149,13 +158,42 @@ function AvatarModel() {
     </>;
 }
 
+// Eases towards the latest synced pose instead of jumping to it when a new update arrives
+function SmoothedGroup({ position, rotation, children }) {
+    const groupRef = useRef();
+    const initialized = useRef(false);
+
+    useFrame((_state, delta) => {
+        const group = groupRef.current;
+        if (!group || !position || !rotation) return;
+
+        tempPosition.fromArray(position);
+        tempQuaternion.setFromEuler(tempEuler.set(rotation[0], rotation[1], rotation[2]));
+
+        if (!initialized.current) {
+            initialized.current = true;
+            group.position.copy(tempPosition);
+            group.quaternion.copy(tempQuaternion);
+            return;
+        }
+
+        const alpha = 1 - Math.exp(-POSE_SMOOTHING * delta);
+        group.position.lerp(tempPosition, alpha);
+        group.quaternion.slerp(tempQuaternion, alpha);
+    });
+
+    return <group ref={groupRef}>
+        {children}
+    </group>;
+}
+
 function AvatarInSameSpace() {
     const [position] = useProperty('position');
     const [rotation] = useProperty('rotation');
 
-    return <group position={position} rotation={rotation}>
+    return <SmoothedGroup position={position} rotation={rotation}>
         <AvatarModel />
-    </group>;
+    </SmoothedGroup>;
 }
 
 // FIXME: Skip this case for now as it requires to also work in the other direction
@@ -178,9 +216,9 @@ function AvatarInOtherContainer() {
     const [otherSpaceRelativeRotation] = useProperty('otherSpaceRelativeRotation');
 
     return <group position={position} rotation={rotation}>
-        <group position={otherSpaceRelativePosition} rotation={otherSpaceRelativeRotation}>
+        <SmoothedGroup position={otherSpaceRelativePosition} rotation={otherSpaceRelativeRotation}>
             <AvatarModel />
-        </group>
+        </SmoothedGroup>
     </group>;
 }
 

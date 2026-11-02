@@ -87,7 +87,7 @@ function UserNameForwarder({ setUserName, setUser }) {
     }, [name, setUser, user]);
 }
 
-const SLOW_WRITEBACK_TIMEOUT = 500;
+const SLOW_WRITEBACK_TIMEOUT = 100;
 const getActiveDeviceType = () => {
     const session = window.xrStore?.getState?.()?.session;
     if (!session) return 'browser';

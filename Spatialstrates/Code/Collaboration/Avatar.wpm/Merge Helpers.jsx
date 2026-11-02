@@ -3,7 +3,7 @@ const { useState, useEffect } = React;
 
 
 
-export const MERGE_SYNC_INTERVAL = 200;
+export const MERGE_SYNC_INTERVAL = 100;
 
 // Returns the local camera avatar and its merge partner, or null when this device is not merged
 export const getMergeInfo = async () => {

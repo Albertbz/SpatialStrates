@@ -3,6 +3,7 @@ const { useEffect, useMemo, useRef, Suspense } = React;
 import { Canvas, useThree } from '@react-three/fiber';
 import { XR, XROrigin, createXRStore, IfInSessionMode, useXR, useXRInputSourceState, noEvents, PointerEvents } from '@react-three/xr';
 import { Stats, Environment } from '@react-three/drei';
+import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Varv, useProperty } from '#VarvReact';
 
 import { DynamicComponents } from '#Spatialstrates .dynamic-components';
@@ -147,6 +148,8 @@ export function SceneView({ movableSceneComponents }) {
             shadows
             style={{ touchAction: 'none' }}
             events={noEvents} // We use the PointerEvents component from @react-three/xr instead
+            // uikit keeps its layers in a fixed order, otherwise each eye sorts them by its own depth and they flicker in one eye
+            onCreated={({ gl }) => gl.setTransparentSort(reversePainterSortStable)}
         >
             <PointerEvents />
             {/* Keeps suspending assets inside the scene from suspending the whole app, which blocks all GUI updates */}

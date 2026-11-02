@@ -147,7 +147,10 @@ function SubMenus() {
         padding={16}
         gap={16}
         flexDirection="column">
-        {showMenu ? output : null}
+        {/* The items stay mounted while closed, so opening the menu does not have to build them first */}
+        <Container display={showMenu ? 'flex' : 'none'} flexDirection="column" gap={16}>
+            {output}
+        </Container>
         <Button
             variant="primary"
             flexDirection="row"

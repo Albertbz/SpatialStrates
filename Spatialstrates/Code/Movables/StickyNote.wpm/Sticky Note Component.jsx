@@ -1,24 +1,18 @@
 import React from 'react';
-const { useState, useMemo, useRef } = React;
+const { useState, useMemo } = React;
 import { ErrorBoundary } from 'react-error-boundary';
 import { MeshStandardMaterial } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { useFrame } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
-import { Text as UIText } from '@react-three/uikit';
+import { Container, Text as UIText } from '@react-three/uikit';
 import { Panel, Button } from '@react-three/uikit-horizon';
 import { useProperty } from '#VarvReact';
 
 import { Movable } from '#Spatialstrates .movable';
 import { Text } from '#Spatialstrates .text';
-import { Icon } from '#Icon .default';
-import { transcribeAudio } from '#AIHelpers .default';
-
 
 
 
 const frameGeometry = new RoundedBoxGeometry(0.15, 0.15, 0.005, 1);
-useGLTF.preload('microphone.glb');
 
 const frameMaterialMap = new Map();
 frameMaterialMap.set('red', new MeshStandardMaterial({ color: 'hsl(0, 95%, 60%)', metalness: 0.2, roughness: 0.5 }));
@@ -38,24 +32,56 @@ frameMaterialHoveredMap.set('purple', new MeshStandardMaterial({ color: 'hsl(250
 frameMaterialHoveredMap.set('orange', new MeshStandardMaterial({ color: 'hsl(28, 95%, 70%)', metalness: 0.2, roughness: 0.5 }));
 frameMaterialHoveredMap.set('pink', new MeshStandardMaterial({ color: 'hsl(310, 95%, 70%)', metalness: 0.2, roughness: 0.5 }));
 
+const KEYBOARD_LETTER_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 
+
+
+function StickyNoteKeyboard({ shiftActive, onToggleShift, onCharacter, onSpace, onNewline, onDelete }) {
+    return <Panel anchorX="center" anchorY="top" padding={8} gap={4} flexDirection="column" pixelSize={0.0005}>
+        {KEYBOARD_LETTER_ROWS.map(row => <Container key={row} flexDirection="row" gap={4} justifyContent="center">
+            {[...row].map(character => {
+                const label = shiftActive ? character.toUpperCase() : character;
+                return <Button key={character} variant="tertiary" onClick={() => onCharacter(label)}>
+                    <UIText>{label}</UIText>
+                </Button>;
+            })}
+        </Container>)}
+        <Container flexDirection="row" gap={4} justifyContent="center">
+            <Button variant={shiftActive ? 'primary' : 'secondary'} onClick={onToggleShift}>
+                <UIText>Shift</UIText>
+            </Button>
+            <Button variant="tertiary" onClick={onSpace}>
+                <UIText>Space</UIText>
+            </Button>
+            <Button variant="tertiary" onClick={onNewline}>
+                <UIText>Enter</UIText>
+            </Button>
+            <Button variant="secondary" onClick={onDelete}>
+                <UIText>Delete</UIText>
+            </Button>
+        </Container>
+    </Panel>;
+}
 
 function StickyNote() {
-    const iconRef = useRef();
-    const microphoneIcon = useGLTF('microphone.glb');
-    const [listening, setListening] = useState(false);
     const [text, setText] = useProperty('text');
     const [selected] = useProperty('selected');
     const [hovered] = useProperty('hovered');
     const [color, setColor] = useProperty('color');
     const [showColorOptions, setShowColorOptions] = useState(false);
+    const [shiftActive, setShiftActive] = useState(false);
 
-    async function updateText() {
-        if (listening) return;
+    function typeText(addition) {
+        setText((text || '') + addition);
+    }
 
-        setListening(true);
-        const newText = await transcribeAudio(5000, false, () => { setListening(false); });
-        if (newText) setText(newText);
+    function typeCharacter(character) {
+        typeText(character);
+        setShiftActive(false);
+    }
+
+    function deleteCharacter() {
+        setText((text || '').slice(0, -1));
     }
 
     const handle = useMemo(() => <mesh
@@ -64,14 +90,6 @@ function StickyNote() {
         position={[0, 0.025, 0]}
         autoUpdateMatrix={false}
     />, [hovered, selected, color]);
-
-    useFrame((state) => {
-        if (!iconRef.current) return;
-        const minScale = 0.4;
-        const maxScale = 0.6;
-        const targetScale = listening ? minScale + (maxScale - minScale) * (Math.sin(state.clock.elapsedTime * 5) * 0.5 + 0.5) : 0.5;
-        iconRef.current.scale.setScalar(targetScale);
-    });
 
     return <Movable handle={handle} upright={false}>
         <Text
@@ -85,9 +103,6 @@ function StickyNote() {
             {text}
         </Text>
         {selected ? <>
-            <group ref={iconRef} position={[0.1, 0.025, 0]} rotation={[0, -Math.PI, 0]}>
-                <Icon model={microphoneIcon} onClick={updateText} />
-            </group>
             <group position={[0, -0.06, 0]} rotation={[0, 0, 0]}>
                 <Panel anchorX="center" anchorY="top" padding={16} gap={8} flexDirection="row" pixelSize={0.0005}>
                     <Button variant="secondary" onClick={() => setShowColorOptions(!showColorOptions)}>
@@ -117,6 +132,15 @@ function StickyNote() {
                         </Button>
                     </>) : null}
                 </Panel>
+            </group>
+            <group position={[0, -0.14, 0]} rotation={[0, 0, 0]}>
+                <StickyNoteKeyboard
+                    shiftActive={shiftActive}
+                    onToggleShift={() => setShiftActive(!shiftActive)}
+                    onCharacter={typeCharacter}
+                    onSpace={() => typeText(' ')}
+                    onNewline={() => typeText('\n')}
+                    onDelete={deleteCharacter} />
             </group>
         </> : null}
     </Movable>;

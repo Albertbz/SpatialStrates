@@ -99,3 +99,35 @@
         text-shadow: 0 1px 2px black;
     }
 }
+
+// The 2D grid is drawn at the size of the 3D grid, so its labels are scaled down to the tiles
+.webcam-grid-shape {
+    .webcam-tile {
+        .tile-name {
+            left: 3px;
+            bottom: 2px;
+            max-width: calc(100% - 6px);
+            font-size: 7px;
+        }
+
+        .tile-badge {
+            top: 2px;
+            left: 2px;
+            padding: 1px 3px;
+            font-size: 6px;
+
+            .material-icons {
+                font-size: 8px;
+            }
+
+            &.presenting-badge {
+                left: auto;
+                right: 2px;
+            }
+        }
+
+        .in-xr-overlay {
+            font-size: 7px;
+        }
+    }
+}

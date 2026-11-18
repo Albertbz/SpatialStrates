@@ -50,6 +50,7 @@ if (!window.moduleVideoStreamManager) {
     // Convenience functions for managing Varv spawning and despawning
     window.stopSharingMyVideo = async () => {
         window.moduleVideoStreamManager.streamShare.stopSharing();
+        window.dispatchEvent(new Event('video-share-changed'));
         const concept = VarvEngine.getConceptFromType(CONCEPT_NAME);
         const instances = await VarvEngine.lookupInstances(CONCEPT_NAME, new FilterProperty('client', FilterOps.equals, webstrate.clientId));
         instances.forEach(instance => concept.delete(instance));
@@ -65,6 +66,7 @@ if (!window.moduleVideoStreamManager) {
             audio: false
         });
         if (stream) {
+            window.dispatchEvent(new Event('video-share-changed'));
             stream.getVideoTracks()[0].addEventListener('ended', () => {
                 window.stopSharingMyVideo();
             });

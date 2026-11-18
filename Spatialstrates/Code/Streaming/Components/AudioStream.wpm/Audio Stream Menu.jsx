@@ -11,11 +11,32 @@ import AudioStreamManager from '#AudioStreamManager .default';
 
 
 addSubMenu('media-sharing', 500, false);
-addItemToSubMenu('media-sharing', 'share-audio', <MenuButton onClick={window.shareMyAudio}>Share Audio</MenuButton>, 500);
-addItemToSubMenu('media-sharing', 'stop-audio', <MenuButton onClick={window.stopSharingMyAudio}>Stop Audio</MenuButton>, 600);
+// Whether this client currently shares its microphone, kept in sync by the manager
+function useIsSharingAudio() {
+    const [sharing, setSharing] = React.useState(() => !!window.moduleAudioStreamManager.streamShare.currentStream);
+    React.useEffect(() => {
+        const update = () => setSharing(!!window.moduleAudioStreamManager.streamShare.currentStream);
+        window.addEventListener('audio-share-changed', update);
+        return () => window.removeEventListener('audio-share-changed', update);
+    }, []);
+    return sharing;
+}
+
+function ShareAudioButton() {
+    const sharing = useIsSharingAudio();
+    const toggleSharing = () => sharing ? window.stopSharingMyAudio() : window.shareMyAudio();
+    return <MenuButton onClick={toggleSharing} toggled={sharing ? 'true' : null}>Share Audio ({sharing ? 'On' : 'Off'})</MenuButton>;
+}
+
+function ShareAudioControllerButton() {
+    const sharing = useIsSharingAudio();
+    const toggleSharing = () => sharing ? window.stopSharingMyAudio() : window.shareMyAudio();
+    return <ControllerMenuButton onClick={toggleSharing} toggled={sharing ? 'true' : null}>Share Audio ({sharing ? 'On' : 'Off'})</ControllerMenuButton>;
+}
+
+addItemToSubMenu('media-sharing', 'share-audio', <ShareAudioButton />, 500);
 addItemToSubMenu('media-sharing', 'spacer3', <MenuSpacer />, 700);
 
 addControllerSubMenu('media-sharing', 500, false);
-addItemToControllerSubMenu('media-sharing', 'share-audio', <ControllerMenuButton onClick={window.shareMyAudio}>Share Audio</ControllerMenuButton>, 500);
-addItemToControllerSubMenu('media-sharing', 'stop-audio', <ControllerMenuButton onClick={window.stopSharingMyAudio}>Stop Audio</ControllerMenuButton>, 600);
+addItemToControllerSubMenu('media-sharing', 'share-audio', <ShareAudioControllerButton />, 500);
 addItemToControllerSubMenu('media-sharing', 'spacer3', <ControllerMenuSpacer />, 700);

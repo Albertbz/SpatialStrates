@@ -14,8 +14,23 @@ import VideoStreamManager from '#VideoStreamManager .default';
 
 
 addSubMenu('media-sharing', 500, false);
-addItemToSubMenu('media-sharing', 'share-video', <MenuButton onClick={window.shareMyVideo}>Share Video</MenuButton>, 300);
-addItemToSubMenu('media-sharing', 'stop-video', <MenuButton onClick={window.stopSharingMyVideo}>Stop Video</MenuButton>, 400);
+// Whether this client currently shares its camera, kept in sync by the manager
+function useIsSharingVideo() {
+    const [sharing, setSharing] = React.useState(() => !!window.moduleVideoStreamManager.streamShare.currentStream);
+    React.useEffect(() => {
+        const update = () => setSharing(!!window.moduleVideoStreamManager.streamShare.currentStream);
+        window.addEventListener('video-share-changed', update);
+        return () => window.removeEventListener('video-share-changed', update);
+    }, []);
+    return sharing;
+}
+
+function ShareVideoButton() {
+    const sharing = useIsSharingVideo();
+    const toggleSharing = () => sharing ? window.stopSharingMyVideo() : window.shareMyVideo();
+    return <MenuButton onClick={toggleSharing} toggled={sharing ? 'true' : null}>Share Video ({sharing ? 'On' : 'Off'})</MenuButton>;
+}
+addItemToSubMenu('media-sharing', 'share-video', <ShareVideoButton />, 300);
 addItemToSubMenu('media-sharing', 'spacer2', <MenuSpacer />, 450);
 
 // Switches everyone between the grid following each XR user's head and a shared grid that can be moved around

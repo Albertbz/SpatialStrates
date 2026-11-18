@@ -251,7 +251,8 @@
         "Webcam Grid Scene.jsx",
         "Webcam Grid Component.jsx",
         "Init Manager Concept.js",
-        "Webcam Grid Shape.jsx"
+        "Webcam Grid Shape.jsx",
+        "Webcam Grid Style.scss"
     ],
     "/Code/Streaming/Components/AudioStream.wpm": [
         "descriptor.json",

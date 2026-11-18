@@ -11,6 +11,12 @@
     bottom: 80px;
     border-bottom: 4px solid hsl(204, 16%, 85%);
 
+    // Leaves room for the sidebar while it shows the presenter view or webcam tiles
+    body.has-webcam-sidebar &,
+    body.has-presenter-view & {
+        right: var(--sidebar-width);
+    }
+
     &.color-red {
         border-color: hsl(0, 60%, 85%);
     }

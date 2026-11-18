@@ -3,9 +3,11 @@
         "AvatarManager": {
             "schema": {
                 "enabled": "boolean",
-                "presenterUser": "User",
-                "followPresenter": { "boolean": {
-                    "default": true
+                "presenters": { "array": "User" },
+                "followedUser": "User",
+                "followMode": { "string": {
+                    "enum": [ "off", "pip", "full" ],
+                    "default": "pip"
                 }},
                 "followTarget": { "string": {
                     "enum": [ "view", "grid" ],
@@ -13,7 +15,8 @@
                 }}
             },
             "mappings": {
-                "followPresenter": [ "memory", "cauldron" ]
+                "followedUser": [ "memory", "cauldron" ],
+                "followMode": [ "memory", "cauldron" ]
             }
         },
         "Avatar": {

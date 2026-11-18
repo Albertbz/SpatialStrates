@@ -135,7 +135,8 @@ export function SceneView({ movableSceneComponents }) {
         window.xrStore = store;
     }, [store]);
 
-    return <>
+    // The wrapper is shrunk while the sidebar with the webcam tiles and the presenter view is shown
+    return <div className="scene-canvas">
         <div className="crosshair"></div>
         <Canvas
             mode="concurrent"
@@ -159,5 +160,5 @@ export function SceneView({ movableSceneComponents }) {
                 </XR>
             </Suspense>
         </Canvas>
-    </>;
+    </div>;
 }

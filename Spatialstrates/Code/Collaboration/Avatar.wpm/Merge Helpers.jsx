@@ -36,55 +36,97 @@ export const followPose = (cameraObject, position, rotation, delta) => {
     cameraObject.updateMatrixWorld(true);
 };
 
-// Shared between the follow status GUI, which looks up the presenter, and the scene, which moves the camera.
-// Each fragment that imports this module gets its own instance, so the store has to live on the window.
+// Shared between the follow status GUI, which looks up the presenters, the scene, which moves the camera, and the
+// presenter view. Each fragment that imports this module gets its own instance, so the store has to live on the window.
 if (!window.moduleFollowStore) {
     window.moduleFollowStore = create(() => ({
         status: 'none',
         target: 'view',
         gridMissing: false,
+        presenters: [],
+        followedUser: null,
         presenterName: '',
         presenterClient: null,
+        space: null,
         position: null,
         rotation: null
     }));
 }
 export const useFollowStore = window.moduleFollowStore;
 
-// Returns the presenting user and their camera avatar while it is in VR or AR, or null when nobody is presenting
-export const getPresenterInfo = async () => {
+// Set by the presenter view to the client whose head its camera is in, so only that view hides the presenter's head.
+// Like the store, the context has to be shared between the module instances of each importing fragment.
+if (!window.modulePresenterViewContext) {
+    window.modulePresenterViewContext = React.createContext(null);
+}
+export const PresenterViewContext = window.modulePresenterViewContext;
+
+const getAvatarManager = async () => {
     const managers = await VarvEngine.lookupInstances('AvatarManager');
-    if (managers.length === 0) return null;
-    const presenterUser = await VarvEngine.getConceptFromType('AvatarManager').getPropertyValue(managers[0], 'presenterUser');
-    if (!presenterUser) return null;
+    return managers[0] || null;
+};
 
+// The users presenting their view, the most recent presenter last
+export const getPresenterUsers = async () => {
+    const manager = await getAvatarManager();
+    if (!manager) return [];
+    const presenters = await VarvEngine.getConceptFromType('AvatarManager').getPropertyValue(manager, 'presenters');
+    return Array.isArray(presenters) ? presenters.filter(Boolean) : [];
+};
+
+export const setPresenting = async (user, presenting) => {
+    const manager = await getAvatarManager();
+    if (!manager || !user) return;
+    const presenters = (await getPresenterUsers()).filter(presenter => presenter !== user);
+    if (presenting) presenters.push(user);
+    await VarvEngine.getConceptFromType('AvatarManager').setPropertyValue(manager, 'presenters', presenters);
+};
+
+// Returns every presenting user, with their camera avatar while it is in VR or AR, or null for the avatar otherwise
+export const getPresenters = async () => {
+    const presenterUsers = await getPresenterUsers();
     const avatarConcept = VarvEngine.getConceptFromType('Avatar');
-    const userAvatars = await VarvEngine.lookupInstances('Avatar', FilterAction.constructFilter({
-        and: [
-            { property: 'user', equals: presenterUser },
-            { property: 'type', equals: 'camera' }
-        ]
-    }));
+    const userConcept = VarvEngine.getConceptFromType('User');
+    const presenters = [];
 
-    let presenterAvatar = null;
-    for (const avatar of userAvatars) {
-        if (!await avatarConcept.getPropertyValue(avatar, 'active')) continue;
-        if (!webstrate.clients.includes(await avatarConcept.getPropertyValue(avatar, 'client'))) continue;
-        if (!isXRDeviceType(await avatarConcept.getPropertyValue(avatar, 'deviceType'))) continue;
-        presenterAvatar = avatar;
-        break;
+    for (const user of presenterUsers) {
+        const userAvatars = await VarvEngine.lookupInstances('Avatar', FilterAction.constructFilter({
+            and: [
+                { property: 'user', equals: user },
+                { property: 'type', equals: 'camera' }
+            ]
+        }));
+
+        let presenterAvatar = null;
+        for (const avatar of userAvatars) {
+            if (!await avatarConcept.getPropertyValue(avatar, 'active')) continue;
+            if (!webstrate.clients.includes(await avatarConcept.getPropertyValue(avatar, 'client'))) continue;
+            if (!isXRDeviceType(await avatarConcept.getPropertyValue(avatar, 'deviceType'))) continue;
+            presenterAvatar = avatar;
+            break;
+        }
+
+        presenters.push({
+            user,
+            userName: await userConcept.getPropertyValue(user, 'name'),
+            avatar: presenterAvatar ? {
+                client: await avatarConcept.getPropertyValue(presenterAvatar, 'client'),
+                position: await avatarConcept.getPropertyValue(presenterAvatar, 'position'),
+                rotation: await avatarConcept.getPropertyValue(presenterAvatar, 'rotation'),
+                space: await avatarConcept.getPropertyValue(presenterAvatar, 'space')
+            } : null
+        });
     }
 
-    return {
-        user: presenterUser,
-        userName: await VarvEngine.getConceptFromType('User').getPropertyValue(presenterUser, 'name'),
-        avatar: presenterAvatar ? {
-            client: await avatarConcept.getPropertyValue(presenterAvatar, 'client'),
-            position: await avatarConcept.getPropertyValue(presenterAvatar, 'position'),
-            rotation: await avatarConcept.getPropertyValue(presenterAvatar, 'rotation'),
-            space: await avatarConcept.getPropertyValue(presenterAvatar, 'space')
-        } : null
-    };
+    return presenters;
+};
+
+// The presenter this device watches: the chosen one while they present, otherwise the most recent one in XR
+export const resolveFollowedPresenter = (presenters, followedUser) => {
+    const chosen = presenters.find(presenter => presenter.user === followedUser);
+    if (chosen) return chosen;
+    const inXR = presenters.filter(presenter => presenter.avatar);
+    return inXR[inXR.length - 1] || presenters[presenters.length - 1] || null;
 };
 
 // Returns the local camera avatar and its merge partner, or null when this device is not merged

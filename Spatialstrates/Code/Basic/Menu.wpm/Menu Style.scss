@@ -15,6 +15,12 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 8px;
+
+    // Stays within the canvas while the sidebar shows the presenter view or webcam tiles
+    body.has-webcam-sidebar &,
+    body.has-presenter-view & {
+        right: calc(var(--sidebar-width) + 8px);
+    }
 }
 
 .floating-menu {

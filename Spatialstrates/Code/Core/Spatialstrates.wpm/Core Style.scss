@@ -1,3 +1,10 @@
+:root {
+    // Shared layout of the 2D sidebar holding the presenter view and the webcam tiles
+    --sidebar-width: 256px;
+    --sidebar-top: 48px;
+    --presenter-view-height: 168px;
+}
+
 body {
     height: 100vh;
     margin: 0;
@@ -54,10 +61,25 @@ body {
     pointer-events: none;
 }
 
+.scene-canvas {
+    position: fixed;
+    inset: 0;
+
+    body.has-webcam-sidebar &,
+    body.has-presenter-view & {
+        right: var(--sidebar-width);
+    }
+}
+
 .spatialstrates-stats {
     top: 48px !important;
     right: 12px !important;
     left: auto !important;
+
+    body.has-webcam-sidebar &,
+    body.has-presenter-view & {
+        right: calc(var(--sidebar-width) + 4px) !important;
+    }
 
     canvas {
         border-radius: 3px;

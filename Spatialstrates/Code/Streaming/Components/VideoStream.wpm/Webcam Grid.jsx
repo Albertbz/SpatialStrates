@@ -1,12 +1,13 @@
 import React from 'react';
 const { useEffect, useRef, useState } = React;
+import { Varv, useProperty } from '#VarvReact';
 
 import { doIfClicked } from '#StreamManager .default';
 import { streamShare } from '#VideoStreamManager .default';
 
 
 
-export function WebcamTile({ client, userName, inXR, partnerInXR, style }) {
+export function WebcamTile({ client, userName, inXR, partnerInXR, presenting, onClick, style }) {
     const videoRef = useRef(null);
 
     useEffect(() => {
@@ -40,68 +41,27 @@ export function WebcamTile({ client, userName, inXR, partnerInXR, style }) {
         };
     }, [client]);
 
-    return <div className="webcam-tile" style={{
-        position: 'relative',
-        width: 'clamp(140px, 16vw, 240px)',
-        aspectRatio: '16 / 9',
-        overflow: 'hidden',
-        border: '1px solid #63636370',
-        borderRadius: '8px',
-        backgroundColor: '#202020',
-        boxShadow: '0 2px 8px #00000055',
-        pointerEvents: 'auto',
-        ...style
-    }}>
-        <video ref={videoRef} autoPlay muted playsInline style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover'
-        }} />
+    return <div
+        className={`webcam-tile ${presenting ? 'presenting' : ''} ${onClick ? 'clickable' : ''}`}
+        style={style}
+        onClick={onClick}
+        title={onClick ? `Watch ${userName || 'This User'}` : undefined}>
+        <video ref={videoRef} autoPlay muted playsInline />
         {/* Headsets stop sending camera frames during an immersive session, so their stream turns black */}
-        {inXR && <div style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '4px',
-            color: '#ffffffcc',
-            backgroundColor: '#202020',
-            fontSize: '13px'
-        }}>
+        {inXR && <div className="in-xr-overlay">
             <span className="material-icons">view_in_ar</span>
             In XR
         </div>}
         {/* The video comes from a laptop merged with a headset that is currently in XR */}
-        {!inXR && partnerInXR && <span style={{
-            position: 'absolute',
-            top: '6px',
-            left: '6px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            padding: '2px 6px',
-            borderRadius: '4px',
-            color: 'white',
-            backgroundColor: '#000000aa',
-            fontSize: '11px'
-        }}>
-            <span className="material-icons" style={{ fontSize: '14px' }}>view_in_ar</span>
+        {!inXR && partnerInXR && <span className="tile-badge">
+            <span className="material-icons">view_in_ar</span>
             In XR
         </span>}
-        <span style={{
-            position: 'absolute',
-            left: '8px',
-            bottom: '6px',
-            maxWidth: 'calc(100% - 16px)',
-            overflow: 'hidden',
-            color: 'white',
-            fontSize: '12px',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            textShadow: '0 1px 2px black'
-        }}>{userName || client}</span>
+        {presenting && <span className="tile-badge presenting-badge">
+            <span className="material-icons">present_to_all</span>
+            Presenting
+        </span>}
+        <span className="tile-name">{userName || client}</span>
     </div>;
 }
 
@@ -182,6 +142,7 @@ export async function loadWebcamTiles() {
             : null;
         return {
             client: selected.client,
+            user: selected.avatar.user,
             userName: selected.avatar.userName,
             inXR: isInXR(selected.avatar),
             partnerInXR: Boolean(partner && isInXR(partner)),
@@ -220,27 +181,48 @@ export function useWebcamTiles() {
     return tiles;
 }
 
+// The grid is a sidebar next to the 2D canvas or the 3D view, like the participant panel of a video call
 function WebcamGrid() {
     const tiles = useWebcamTiles();
+    const [presenters] = useProperty('presenters'); // AvatarManager
+    const [followedUser, setFollowedUser] = useProperty('followedUser'); // AvatarManager
+    const [followMode, setFollowMode] = useProperty('followMode'); // AvatarManager
 
-    return <div className="webcam-grid" style={{
-        position: 'fixed',
-        left: '12px',
-        right: '12px',
-        bottom: '80px',
-        zIndex: 10,
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 240px))',
-        maxHeight: '35vh',
-        justifyContent: 'center',
-        gap: '8px',
-        overflow: 'auto',
-        pointerEvents: 'none'
-    }}>
-        {tiles.map(tile => <WebcamTile key={tile.key} client={tile.client} userName={tile.userName} inXR={tile.inXR} partnerInXR={tile.partnerInXR} />)}
+    const presenterUsers = Array.isArray(presenters) ? presenters : [];
+
+    // The 2D canvas and the 3D view only make room for the sidebar while it has tiles
+    const showSidebar = tiles.length > 0;
+    useEffect(() => {
+        document.body.classList.toggle('has-webcam-sidebar', showSidebar);
+        return () => document.body.classList.remove('has-webcam-sidebar');
+    }, [showSidebar]);
+
+    // Clicking the tile of a presenter watches them
+    const watchPresenter = (user) => {
+        setFollowedUser(user);
+        if (followMode === 'off') setFollowMode('pip');
+    };
+
+    return <div className="webcam-grid-panel">
+        {tiles.map(tile => {
+            const presenting = !!tile.user && presenterUsers.includes(tile.user);
+            const canWatch = presenting && (tile.user !== followedUser || followMode === 'off');
+            return <WebcamTile
+                key={tile.key}
+                client={tile.client}
+                userName={tile.userName}
+                inXR={tile.inXR}
+                partnerInXR={tile.partnerInXR}
+                presenting={presenting}
+                onClick={canWatch ? () => watchPresenter(tile.user) : undefined} />;
+        })}
     </div>;
 }
 
 export function Main() {
-    return <WebcamGrid />;
+    return <Varv concept="SpaceManager">
+        <Varv concept="AvatarManager">
+            <WebcamGrid />
+        </Varv>
+    </Varv>;
 }

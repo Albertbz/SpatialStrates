@@ -9,6 +9,7 @@ import { updatePointFromCanvas, CANVAS_SCALE } from '#Spatialstrates .projection
 
 
 const FAST_WRITEBACK_TIMEOUT = 33;
+const PRESENCE_WRITEBACK_INTERVAL = 500;
 
 // Remove other people's Avatars when clients leave or join
 const cleanup = () => {
@@ -89,19 +90,32 @@ function AvatarTransmitter({ type }) {
         runAsync();
     }, [type, xrPlatform]);
 
+    // Avatars are shared through signaling, which does not keep values for clients that join later, so they are
+    // written repeatedly like in the 3D view. The camera avatar is always active in 2D, as it represents the laptop
+    // in the user list and the webcam grid, the cursor only becomes active once it moves over the canvas.
+    const presenceRef = useRef({});
+    presenceRef.current = { currentSpace, userName, user };
     useEffect(() => {
-        if (!conceptRef.current) return;
-        avatarConcept.setPropertyValue(conceptRef.current, 'space', currentSpace || '');
-        avatarConcept.setPropertyValue(conceptRef.current, 'userName', userName || '');
-        avatarConcept.setPropertyValue(conceptRef.current, 'user', user || '');
-        avatarConcept.setPropertyValue(conceptRef.current, 'deviceType', 'browser');
-        avatarConcept.setPropertyValue(conceptRef.current, 'deviceClass', 'laptop');
-        avatarConcept.setPropertyValue(conceptRef.current, 'view', '2D');
+        const writePresence = () => {
+            if (!conceptRef.current) return;
+            const { currentSpace, userName, user } = presenceRef.current;
+            if (type === 'camera') avatarConcept.setPropertyValue(conceptRef.current, 'active', true);
+            avatarConcept.setPropertyValue(conceptRef.current, 'space', currentSpace || '');
+            avatarConcept.setPropertyValue(conceptRef.current, 'userName', userName || '');
+            avatarConcept.setPropertyValue(conceptRef.current, 'user', user || '');
+            avatarConcept.setPropertyValue(conceptRef.current, 'deviceType', 'browser');
+            avatarConcept.setPropertyValue(conceptRef.current, 'deviceClass', 'laptop');
+            avatarConcept.setPropertyValue(conceptRef.current, 'view', '2D');
 
-        avatarConcept.setPropertyValue(conceptRef.current, 'otherSpace', '');
-        avatarConcept.setPropertyValue(conceptRef.current, 'otherSpaceRelativePosition', [0, 0, 0]);
-        avatarConcept.setPropertyValue(conceptRef.current, 'otherSpaceRelativeRotation', [0, 0, 0]);
-    }, [currentSpace, userName, user]);
+            avatarConcept.setPropertyValue(conceptRef.current, 'otherSpace', '');
+            avatarConcept.setPropertyValue(conceptRef.current, 'otherSpaceRelativePosition', [0, 0, 0]);
+            avatarConcept.setPropertyValue(conceptRef.current, 'otherSpaceRelativeRotation', [0, 0, 0]);
+        };
+
+        writePresence();
+        const interval = setInterval(writePresence, PRESENCE_WRITEBACK_INTERVAL);
+        return () => clearInterval(interval);
+    }, [type, currentSpace, userName, user]);
 
     useEffect(() => {
         if (type !== 'cursor') return;

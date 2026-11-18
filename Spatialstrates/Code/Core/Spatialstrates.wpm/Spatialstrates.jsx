@@ -38,10 +38,45 @@ const xrPlatformPromise = detectXRPlatform().catch(() => 'None');
 
 const XR_PLATFORM_RETRY_DELAY = 500;
 
+// Laptops start in 2D, where they can best interact with the content, XR-capable devices start in 3D
+function useInitialView(setCurrentView) {
+    const setCurrentViewRef = useRef(setCurrentView);
+    setCurrentViewRef.current = setCurrentView;
+
+    useEffect(() => {
+        if (window.moduleInitialViewSet) return;
+        let cancelled = false;
+        let retryTimeout = null;
+
+        const setInitialView = async () => {
+            const xrPlatform = await xrPlatformPromise;
+            if (cancelled) return;
+            if (xrPlatform !== 'None') {
+                window.moduleInitialViewSet = true;
+                return;
+            }
+            try {
+                if (typeof setCurrentViewRef.current !== 'function') throw new Error('Varv binding not ready');
+                await setCurrentViewRef.current('2D');
+                window.moduleInitialViewSet = true;
+            } catch (e) {
+                if (!cancelled) retryTimeout = setTimeout(setInitialView, XR_PLATFORM_RETRY_DELAY);
+            }
+        };
+
+        setInitialView();
+        return () => {
+            cancelled = true;
+            clearTimeout(retryTimeout);
+        };
+    }, []);
+}
+
 function SpaceView() {
-    const [currentView] = useProperty('currentView');
+    const [currentView, setCurrentView] = useProperty('currentView');
     const [currentSpace, setCurrentSpace] = useProperty('locationHash');
     const [storedXRPlatform, setXRPlatform] = useProperty('xrPlatform');
+    useInitialView(setCurrentView);
 
     // The setter from useProperty changes on every render, so retries use the latest one through a ref
     const setXRPlatformRef = useRef(setXRPlatform);

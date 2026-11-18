@@ -12,14 +12,15 @@ import {
     useStalePairCleanup,
     LocalAvatarReporter
 } from '#UserDisplay .pairing-helpers';
-import { isXRDeviceType } from '#Avatar .merge-helpers';
+import { isXRDeviceType, useFollowStore } from '#Avatar .merge-helpers';
 
 
 
 function UserIcon({ localAvatar }) {
     const [localUser] = useProperty('localUser');
-    const [presenterUser, setPresenterUser] = useProperty('presenterUser'); // AvatarManager
-    const [, setFollowPresenter] = useProperty('followPresenter'); // AvatarManager
+    const [presenters] = useProperty('presenters'); // AvatarManager
+    const [, setFollowedUser] = useProperty('followedUser'); // AvatarManager
+    const [followMode, setFollowMode] = useProperty('followMode'); // AvatarManager
     const [locationHash] = useProperty('locationHash'); // SpaceManager
     const [xrPlatform] = useProperty('xrPlatform'); // SpaceManager
     const [space] = useProperty('space');
@@ -34,6 +35,8 @@ function UserIcon({ localAvatar }) {
     const [pairedAvatar] = useProperty('pairedAvatar');
     const [type] = useProperty('type');
     const [active] = useProperty('active');
+    // The store has the resolved presenter, as no choice means the most recent presenter
+    const watchedUser = useFollowStore(state => ['pip', 'following', 'waiting'].includes(state.status) ? state.followedUser : null);
 
     const isLocalAvatar = client === webstrate.clientId;
     const pairedWithMe = !!localAvatar?.uuid && pairedAvatar === localAvatar.uuid;
@@ -78,28 +81,24 @@ function UserIcon({ localAvatar }) {
         action = <button onClick={pairWithDevice} disabled={!localAvatar || localBusy} title={`Pair with ${name || 'this device'}`}>Pair</button>;
     }
 
-    // Anyone in XR can be followed like the presenter of a video call
-    const isPresenter = !!user && presenterUser === user;
-    const canFollow = !!user && !isLocalAvatar && localUser !== user && isXRDeviceType(deviceType);
+    // XR users choose to present themselves, laptops only choose which presenter they watch
+    const isPresenter = !!user && Array.isArray(presenters) && presenters.includes(user);
+    const canWatch = isPresenter && !isLocalAvatar && localUser !== user && isXRDeviceType(deviceType);
+    const watching = watchedUser === user;
 
-    const followUser = (event) => {
+    const watchUser = (event) => {
         event.stopPropagation();
-        setPresenterUser(user);
-        setFollowPresenter(true);
-    };
-
-    const stopPresenting = (event) => {
-        event.stopPropagation();
-        setPresenterUser('');
+        setFollowedUser(user);
+        if (followMode === 'off') setFollowMode('pip');
     };
 
     return <div className={`user-icon ${localUser === user ? 'local-user' : ''} ${isPresenter ? 'presenter' : ''}`}>
         <span>{name || ''}</span>
         <small>{deviceLabel}</small>
         {canPair && action}
-        {canFollow && (isPresenter
-            ? <button onClick={stopPresenting} title={`Stop following ${name || 'this user'} for everyone`}>Presenting</button>
-            : <button onClick={followUser} title={`Make everyone follow ${name || 'this user'}`}>Follow</button>)}
+        {canWatch && (watching
+            ? <button disabled>Watching</button>
+            : <button onClick={watchUser} title={`Watch the view of ${name || 'this user'}`}>Watch</button>)}
     </div>;
 }
 

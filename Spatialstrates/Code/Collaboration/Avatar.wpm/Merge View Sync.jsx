@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import { Varv, useProperty } from '#VarvReact';
 
-import { getMergeInfo, followPose, stopMouseLook, useFollowStore, MERGE_SYNC_INTERVAL } from '#Avatar .merge-helpers';
+import { getMergeInfo, getPresenters, resolveFollowedPresenter, isXRDeviceType, followPose, stopMouseLook, useFollowStore, MERGE_SYNC_INTERVAL } from '#Avatar .merge-helpers';
 
 
 
@@ -21,6 +21,51 @@ const getYaw = (quaternion) => {
 
 const quaternionFromRotation = (rotation, target) => {
     return target.setFromEuler(new Euler(rotation[0], rotation[1], rotation[2]));
+};
+
+// How far to the side of the presenter a remote user starts in VR, so they do not stand inside the people in the room
+const PRESENTER_SIDE_OFFSET = 1;
+
+// Where an unmerged headset starts in VR: where the user's laptop looks from in 3D, otherwise beside the presenter
+const getEntryPose = async () => {
+    const userManagers = await VarvEngine.lookupInstances('UserManager');
+    const localUser = userManagers[0]
+        ? await VarvEngine.getConceptFromType('UserManager').getPropertyValue(userManagers[0], 'localUser')
+        : null;
+    const avatarConcept = VarvEngine.getConceptFromType('Avatar');
+
+    if (localUser) {
+        const userAvatars = await VarvEngine.lookupInstances('Avatar', FilterAction.constructFilter({
+            and: [
+                { property: 'user', equals: localUser },
+                { property: 'type', equals: 'camera' }
+            ]
+        }));
+        for (const avatar of userAvatars) {
+            const client = await avatarConcept.getPropertyValue(avatar, 'client');
+            if (client === webstrate.clientId || !webstrate.clients.includes(client)) continue;
+            if (!await avatarConcept.getPropertyValue(avatar, 'active')) continue;
+            if (isXRDeviceType(await avatarConcept.getPropertyValue(avatar, 'deviceType'))) continue;
+            if (await avatarConcept.getPropertyValue(avatar, 'view') !== '3D') continue;
+            // A laptop following the presenter looks out from the presenter's head
+            if (await avatarConcept.getPropertyValue(avatar, 'followingPresenter')) continue;
+            return {
+                position: await avatarConcept.getPropertyValue(avatar, 'position'),
+                rotation: await avatarConcept.getPropertyValue(avatar, 'rotation')
+            };
+        }
+    }
+
+    const presenters = (await getPresenters()).filter(presenter => presenter.user !== localUser && presenter.avatar);
+    const presenter = resolveFollowedPresenter(presenters, useFollowStore.getState().followedUser);
+    if (!presenter) return null;
+
+    const yaw = getYaw(quaternionFromRotation(presenter.avatar.rotation, new Quaternion()));
+    const side = new Vector3(PRESENTER_SIDE_OFFSET, 0, 0).applyAxisAngle(upAxis, yaw);
+    return {
+        position: [presenter.avatar.position[0] + side.x, presenter.avatar.position[1], presenter.avatar.position[2] + side.z],
+        rotation: [0, yaw, 0]
+    };
 };
 
 function MergeViewSync() {
@@ -47,19 +92,48 @@ function MergeViewSync() {
         return () => clearInterval(interval);
     }, []);
 
+    // The entry pose of an unmerged headset is looked up once per session, and is undefined until it is known
+    const entryPose = useRef(null);
     useEffect(() => {
         needsAlignment.current = !!session;
+        entryPose.current = undefined;
+        if (!session) return;
+
+        let cancelled = false;
+        getEntryPose().then(pose => {
+            if (!cancelled) entryPose.current = pose;
+        }).catch(error => {
+            console.warn('Could not find where to start in VR:', error);
+            if (!cancelled) entryPose.current = null;
+        });
+        return () => {
+            cancelled = true;
+        };
     }, [session]);
 
     // Starts a VR session where the merged laptop was looking from, so the view continues across devices.
+    // Unmerged headsets start where the user's laptop looks from, or beside the presenter.
     // AR sessions are not moved, as the virtual content has to stay registered with the physical room.
     const alignXROrigin = (frame) => {
         needsAlignment.current = false;
 
         const info = mergeInfo.current;
         const origin = window.moduleDeviceManager?.origin;
-        if (mode !== 'immersive-vr' || !info || !origin) return;
-        if (info.partner.view !== '3D' || !info.partner.position || !info.partner.rotation) return;
+        if (mode !== 'immersive-vr' || !origin) return;
+
+        let target;
+        if (info) {
+            if (info.partner.view !== '3D' || !info.partner.position || !info.partner.rotation) return;
+            target = info.partner;
+        } else if (entryPose.current === undefined) {
+            // The entry pose is still being looked up, try again next frame
+            needsAlignment.current = true;
+            return;
+        } else if (entryPose.current?.position && entryPose.current?.rotation) {
+            target = entryPose.current;
+        } else {
+            return;
+        }
 
         const viewerPose = frame.getViewerPose(referenceSpace);
         if (!viewerPose) {
@@ -70,12 +144,12 @@ function MergeViewSync() {
 
         const { position: headPosition, orientation: headOrientation } = viewerPose.transform;
         const headYaw = getYaw(tempQuaternion.set(headOrientation.x, headOrientation.y, headOrientation.z, headOrientation.w));
-        const partnerYaw = getYaw(quaternionFromRotation(info.partner.rotation, tempQuaternion));
-        const originYaw = partnerYaw - headYaw;
+        const targetYaw = getYaw(quaternionFromRotation(target.rotation, tempQuaternion));
+        const originYaw = targetYaw - headYaw;
 
         // Keep the floor height of the physical room, but match the horizontal position and the viewing direction
         tempPosition.set(headPosition.x, 0, headPosition.z).applyAxisAngle(upAxis, originYaw);
-        origin.position.set(info.partner.position[0] - tempPosition.x, 0, info.partner.position[2] - tempPosition.z);
+        origin.position.set(target.position[0] - tempPosition.x, 0, target.position[2] - tempPosition.z);
         origin.rotation.set(0, originYaw, 0);
     };
 

@@ -86,12 +86,14 @@
         font-size: 18px;
     }
 
-    button {
+    button,
+    select {
         @include heading-font;
         padding: 4px 12px;
         border: 1px solid #cccccc70;
         border-radius: 14px;
         background: #fff;
+        color: #000;
         cursor: pointer;
     }
 
@@ -99,5 +101,78 @@
     &.presenting {
         background: hsla(14, 100%, 60%, .85);
         color: #fff;
+    }
+}
+
+.presenter-view-panel {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 2px solid hsl(14, 100%, 60%);
+    background: #202020;
+    box-shadow: 0 2px 8px #00000055;
+    box-sizing: border-box;
+
+    // Top of the sidebar, above the webcam tiles
+    &.sidebar {
+        top: var(--sidebar-top);
+        right: 8px;
+        width: calc(var(--sidebar-width) - 16px);
+        height: var(--presenter-view-height);
+        z-index: 99950;
+    }
+
+    // Covers the 2D canvas, but leaves the sidebar and the menus visible
+    &.expanded {
+        top: 8px;
+        left: 8px;
+        right: var(--sidebar-width);
+        bottom: 88px;
+        z-index: 99940;
+    }
+
+    .presenter-view-header {
+        @include heading-font;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 28px;
+        padding: 0 4px 0 8px;
+        flex: 0 0 auto;
+        color: #fff;
+        background: hsla(14, 100%, 60%, .85);
+        user-select: none;
+
+        .material-icons {
+            font-size: 16px;
+        }
+
+        .presenter-view-name {
+            flex: 1 1 auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        button {
+            padding: 2px;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            background: transparent;
+            cursor: pointer;
+
+            &:hover {
+                background: #ffffff33;
+            }
+        }
+    }
+
+    .presenter-view-canvas {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
     }
 }

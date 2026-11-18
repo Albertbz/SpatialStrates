@@ -1,5 +1,5 @@
 import React from 'react';
-let { useState, useEffect, useRef, Suspense } = React;
+let { useState, useEffect, useRef, useContext, Suspense } = React;
 import { ErrorBoundary } from 'react-error-boundary';
 import { Vector3, Quaternion, Euler } from 'three';
 import { useFrame } from '@react-three/fiber';
@@ -8,7 +8,7 @@ import { unzipSync } from 'fflate';
 import { Varv, useProperty } from '#VarvReact';
 
 import { Text } from '#Spatialstrates .text';
-import { useMergePartnerClient, useFollowStore } from '#Avatar .merge-helpers';
+import { useMergePartnerClient, useFollowStore, PresenterViewContext } from '#Avatar .merge-helpers';
 
 
 
@@ -328,10 +328,12 @@ function Avatars() {
     const partnerClient = useMergePartnerClient();
     // Only while following the presenter's view is their head where the camera is
     const followedClient = useFollowStore(state => state.status === 'following' && state.target === 'view' ? state.presenterClient : null);
+    // The presenter view looks out from the presenter's head
+    const presenterViewClient = useContext(PresenterViewContext);
 
     return <>
         <Varv concept="Avatar" if="!isMine">
-            <Avatar hiddenClient={partnerClient} hiddenCameraClient={followedClient} />
+            <Avatar hiddenClient={partnerClient} hiddenCameraClient={presenterViewClient || followedClient} />
         </Varv>
         {/* <Varv concept="Avatar" if="isMine">
             <AvatarRemoteController />

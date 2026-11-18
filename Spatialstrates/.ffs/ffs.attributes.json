@@ -696,7 +696,7 @@
                 "Avatar Component.jsx": {
                     "_attributes": {
                         "data-type": "text/javascript+babel",
-                        "class": "dynamic-scene-component"
+                        "class": "avatar-component dynamic-scene-component"
                     }
                 },
                 "Avatar Canvas Controller.jsx": {
@@ -873,6 +873,12 @@
                         "_attributes": {
                             "data-type": "text/javascript+babel",
                             "class": "dynamic-shape-component"
+                        }
+                    },
+                    "Webcam Grid Style.scss": {
+                        "_attributes": {
+                            "auto": "",
+                            "data-type": "text/x-scss"
                         }
                     }
                 },

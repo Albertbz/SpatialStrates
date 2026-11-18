@@ -3,6 +3,7 @@ import { Varv, useProperty } from '#VarvReact';
 
 import { addSubMenu, addItemToSubMenu, MenuTitle, MenuSpacer, MenuButton } from '#Menu .default';
 import { addControllerSubMenu, addItemToControllerSubMenu, ControllerMenuTitle, ControllerMenuButton } from '#ControllerMenu .default';
+import { setPresenting } from '#Avatar .merge-helpers';
 
 
 
@@ -11,9 +12,14 @@ function AvatarToggleButton() {
     return <MenuButton onClick={() => setEnabled(!enabled)} toggled={enabled ? 'true' : null}>Toggle Avatars ({enabled ? 'On' : 'Off'})</MenuButton>;
 }
 
-function FollowPresenterToggleButton() {
-    const [followPresenter, setFollowPresenter] = useProperty('followPresenter');
-    return <MenuButton onClick={() => setFollowPresenter(!followPresenter)} toggled={followPresenter ? 'true' : null}>Follow Presenter ({followPresenter ? 'On' : 'Off'})</MenuButton>;
+const FOLLOW_MODE_LABELS = { off: 'Off', pip: 'Picture-in-Picture', full: 'Full View' };
+const NEXT_FOLLOW_MODE = { pip: 'full', full: 'off', off: 'pip' };
+
+// Only this device changes how it watches presenters
+function FollowModeButton() {
+    const [followMode, setFollowMode] = useProperty('followMode');
+    const mode = FOLLOW_MODE_LABELS[followMode] ? followMode : 'pip';
+    return <MenuButton onClick={() => setFollowMode(NEXT_FOLLOW_MODE[mode])} toggled={mode !== 'off' ? 'true' : null}>Watch Presenters ({FOLLOW_MODE_LABELS[mode]})</MenuButton>;
 }
 
 // Shared for everyone: following laptops look out from their tile in the movable webcam grid instead of the presenter's view
@@ -24,8 +30,10 @@ function FollowWebcamGridToggleButton() {
 }
 
 function StopPresentingButton() {
-    const [presenterUser, setPresenterUser] = useProperty('presenterUser');
-    return presenterUser ? <MenuButton onClick={() => setPresenterUser('')}>Stop Presenting</MenuButton> : null;
+    const [localUser] = useProperty('localUser'); // UserManager
+    const [presenters] = useProperty('presenters'); // AvatarManager
+    const presenting = !!localUser && Array.isArray(presenters) && presenters.includes(localUser);
+    return presenting ? <MenuButton onClick={() => setPresenting(localUser, false)}>Stop Presenting</MenuButton> : null;
 }
 
 addSubMenu('media-sharing', 500, false);
@@ -34,13 +42,15 @@ addItemToSubMenu('media-sharing', 'avatars', <Varv concept="AvatarManager">
     <AvatarToggleButton />
 </Varv>, 750);
 addItemToSubMenu('media-sharing', 'follow-presenter', <Varv concept="AvatarManager">
-    <FollowPresenterToggleButton />
+    <FollowModeButton />
 </Varv>, 760);
 addItemToSubMenu('media-sharing', 'follow-webcam-grid', <Varv concept="AvatarManager">
     <FollowWebcamGridToggleButton />
 </Varv>, 765);
-addItemToSubMenu('media-sharing', 'stop-presenting', <Varv concept="AvatarManager">
-    <StopPresentingButton />
+addItemToSubMenu('media-sharing', 'stop-presenting', <Varv concept="UserManager">
+    <Varv concept="AvatarManager">
+        <StopPresentingButton />
+    </Varv>
 </Varv>, 770);
 addItemToSubMenu('media-sharing', 'spacer4', <MenuSpacer />, 800);
 
@@ -52,15 +62,12 @@ function AvatarToggleControllerButton() {
 // Makes this user the presenter that laptops follow, or stops presenting
 function PresentMyViewControllerButton() {
     const [localUser] = useProperty('localUser'); // UserManager
-    const [presenterUser, setPresenterUser] = useProperty('presenterUser'); // AvatarManager
-    const presenting = !!localUser && presenterUser === localUser;
+    const [presenters] = useProperty('presenters'); // AvatarManager
+    const presenting = !!localUser && Array.isArray(presenters) && presenters.includes(localUser);
 
+    // Several users can present at the same time, each laptop chooses whom to watch
     const togglePresenting = () => {
-        if (presenting) {
-            setPresenterUser('');
-        } else if (localUser) {
-            setPresenterUser(localUser);
-        }
+        if (localUser) setPresenting(localUser, !presenting);
     };
 
     return <ControllerMenuButton onClick={togglePresenting} toggled={presenting ? 'true' : null}>Present My View ({presenting ? 'On' : 'Off'})</ControllerMenuButton>;

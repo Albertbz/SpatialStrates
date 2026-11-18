@@ -30,6 +30,7 @@ if (!window.moduleAudioStreamManager) {
     // Convenience functions for managing Varv spawning and despawning
     window.stopSharingMyAudio = async () => {
         window.moduleAudioStreamManager.streamShare.stopSharing();
+        window.dispatchEvent(new Event('audio-share-changed'));
         const concept = VarvEngine.getConceptFromType(CONCEPT_NAME);
         const instances = await VarvEngine.lookupInstances(CONCEPT_NAME, new FilterProperty('client', FilterOps.equals, webstrate.clientId));
         instances.forEach(instance => concept.delete(instance));
@@ -45,6 +46,7 @@ if (!window.moduleAudioStreamManager) {
             audio: true
         });
         if (stream) {
+            window.dispatchEvent(new Event('audio-share-changed'));
             stream.getAudioTracks()[0].addEventListener('ended', () => {
                 window.stopSharingMyAudio();
             });
